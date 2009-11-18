@@ -1,0 +1,3 @@
+[submodule "vendors/rest_client"]
+	path = vendors/rest_client
+	url = git@github.com:kvz/rest_client.git
