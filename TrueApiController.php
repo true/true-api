@@ -1,5 +1,5 @@
 <?php
-class TrueApiModel {
+class TrueApiController {
     public $TrueApi;
     public $controller;
     public function __construct($controller, $apiObject) {

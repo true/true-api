@@ -18,7 +18,7 @@ if (!defined('DIR_EGGSHELL_ROOT')) {
 }
 
 require_once DIR_EGGSHELL_ROOT.'/Base.php';
-require_once DIR_TRUEAPI_ROOT.'/TrueApiModel.php';
+require_once DIR_TRUEAPI_ROOT.'/TrueApiController.php';
 require_once DIR_RESTCLIENT_ROOT.'/RestClient.php';
 
 class TrueApi extends Base {
@@ -34,6 +34,7 @@ class TrueApi extends Base {
         'apiUrl' => 'http://admin.true.dev/cakephp/',
         'apiExt' => '.json',
 
+        'log-print-level' => 'debug',
         'log-file' => '/var/log/true-api.log',
         'app-root' => DIR_TRUEAPI_ROOT,
         'class-autobind' => true,
@@ -46,13 +47,13 @@ class TrueApi extends Base {
         );
 
         $this->RestClient = new RestClient($this->_options['apiUrl'], $this->_options['apiExt'], $restOpts);
-        $this->RestClient->add_response_type('json', array(get_class($this), 'parseJson'), '.json');
-        $this->RestClient->add_response_type('xml', array(get_class($this), 'parseXml'), '.xml');
+        $this->RestClient->add_response_type('json', array($this, 'parseJson'), '.json');
+        $this->RestClient->add_response_type('xml', array($this, 'parseXml'), '.xml');
         $this->RestClient->set_response_type('json');
 
         foreach ($this->_controllers as $controller) {
             $model = $this->classify($controller);
-            $this->{$model} = new TrueApiModel($controller, $this);
+            $this->{$model} = new TrueApiController($controller, $this);
         }
     }
 
@@ -72,16 +73,37 @@ class TrueApi extends Base {
         $this->RestClient->headers('Authorization', sprintf('TRUEREST %s', $query));
         return true;
     }
-    
-    public function parseJson($curl_response) {
-    
-        prd(compact('curl_response'));
 
-        return json_decode($curl_response, true);
+    public function handleResponse($response) {
+        
+    }
+    
+    public function parseJson($curlResponse) {
+        $body    = $curlResponse->body;
+        $request = json_decode($body, true);
+
+        if (!is_array(@$request['meta']['feedback'])) {
+            $this->debug('Received invalid response: %s', $body);
+            $this->err('Invalid response from server');
+            return false;
+        }
+        foreach ($request['meta']['feedback'] as $feedback) {
+            if ($feedback['level'] === 'error') {
+                $this->warning('Server said: %s', $feedback['message']);
+            }
+        }
+        
+        if ($request['meta']['status'] === 'error') {
+            return false;
+        }
+        
+        return ;
     }
 
-    public function parseXml($curl_response) {
-        return $curl_response;
+    public function parseXml($curlResponse) {
+
+
+        return $curlResponse;
     }
 
     /**
