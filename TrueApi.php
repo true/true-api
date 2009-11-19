@@ -19,10 +19,12 @@ if (!defined('DIR_EGGSHELL_ROOT')) {
 
 require_once DIR_EGGSHELL_ROOT.'/Base.php';
 require_once DIR_TRUEAPI_ROOT.'/TrueApiController.php';
+require_once DIR_TRUEAPI_ROOT.'/Xml.php';
 require_once DIR_RESTCLIENT_ROOT.'/RestClient.php';
 
 class TrueApi extends Base {
     public    $RestClient   = false;
+    public    $Xml;
     protected $_apiApp      = 'True Api';
     protected $_apiVer      = '0.1';
     protected $_auth        = array();
@@ -31,8 +33,8 @@ class TrueApi extends Base {
         'dns_domains',
     );
     protected $_options     = array(
-        'service' => 'http://admin.true.dev/cakephp/',
-        'format' => 'json',
+        'apiService' => 'http://admin.true.dev/cakephp/',
+        'apiFormat' => 'json',
         'returnData' => false,
 
         'log-file' => '/var/log/true-api.log',
@@ -112,32 +114,12 @@ class TrueApi extends Base {
         }
         $body = $curlResponse->body;
 
-        if (!($simplexml  = @simplexml_load_string($body))) {
-            return $this->_invalidResponse($body);
+        // @todo: A better Unserialize XML:
+        if (!($response = $this->Xml->parse($body))) {
+            return $this->_invalidResponse($curlResponse);
         }
-
-        $response = $this->_xmlUnserialize($simplexml);
-
-        prd($response);
-        // @todo: Unserialize XML:
-        #$response = json_decode($body, true);
+        
         return $this->_handleResponse($response);
-    }
-
-    protected function _xmlUnserialize($simplexml) {
-        foreach ($simplexml->children as $k=>$v) {
-//            if ($v instanceof SimpleXMLElement) {
-//                pr($v->children());
-//                prd($v->children());
-//            }
-
-            if ($v->children()) {
-                $simplexml[$k] = (array)$this->_xmlUnserialize($v->children());
-            } else {
-                $simplexml[$k] = (string)$v;
-            }
-        }
-        return $simplexml;
     }
 
     /**
@@ -164,9 +146,12 @@ class TrueApi extends Base {
         }
 
         // Dynamic options
-        $this->RestClient->set_response_type($this->opt('format'));
-        $this->RestClient->request_prefix = $this->opt('service');
-        $this->RestClient->request_suffix = '.'.$this->opt('format');
+        if ($this->opt('apiFormat') == 'xml') {
+            $this->err('XML Not yet supported');
+        }
+        $this->RestClient->set_response_type($this->opt('apiFormat'));
+        $this->RestClient->request_prefix = $this->opt('apiService');
+        $this->RestClient->request_suffix = '.'.$this->opt('apiFormat');
 
         // Make the call
         if (!method_exists($this->RestClient, $name)) {

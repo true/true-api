@@ -20,6 +20,10 @@ class TrueApiController {
         return $this->TrueApi->delete($path, $vars);
     }
     
+    public function monitored($vars = array()) {
+        return $this->_get(__FUNCTION__, $vars);
+    }
+
     public function index($vars = array()) {
         return $this->_get(__FUNCTION__, $vars);
     }
@@ -29,6 +33,7 @@ class TrueApiController {
     }
     
     public function edit($id, $vars = array()) {
+        $vars = array('data' => $vars);
         return $this->_put(__FUNCTION__.'/'.$id, $vars);
     }
 
