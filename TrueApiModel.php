@@ -12,8 +12,8 @@ class TrueApiModel {
         return $this->TrueApi->get($path, $vars);
     }
 
-    public function index($vars = array()) {
-        return $this->_get(__FUNCTION__, $vars);
+    public function  __call($name,  $arguments) {
+        return $this->_get($name, (array)@$arguments[0]);
     }
 }
 ?>
