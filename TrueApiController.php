@@ -39,6 +39,9 @@ class TrueApiController {
     public function edit($id, $vars = array()) {
         return $this->_put(sprintf('%s/%s', __FUNCTION__, $id), $vars);
     }
+    public function store($vars = array()) {
+        return $this->_put(__FUNCTION__, $vars);
+    }
     public function delete($id, $vars = array()) {
         #return $this->_delete(__FUNCTION__.'/'.$id, $vars);
     }

@@ -31,6 +31,7 @@ class TrueApi extends Base {
     public    $controllers    = array(
         'servers',
         'dns_domains',
+        'pharos_notifications',
     );
     protected $_options     = array(
         'apiService' => 'http://admin.true.dev/cakephp/',
@@ -98,12 +99,13 @@ class TrueApi extends Base {
     }
     
     public function parseJson($curlResponse) {
+        #prd($curlResponse);
         if (!isset($curlResponse->body)) {
             return $this->_invalidResponse($curlResponse, 'No body in curl response');
         }
 
-        if (false === ($response = json_decode($curlResponse->body, true))) {
-            return $this->_invalidResponse($curlResponse, 'json parse error');
+        if (!is_array($response = json_decode($curlResponse->body, true))) {
+            return $this->_invalidResponse($curlResponse->body, 'json parse error');
         }
 
         return $response;

@@ -33,7 +33,9 @@ if (!function_exists('d')) {
 class Play {
 
     public function  __construct() {
-        $this->TrueApi = new TrueApi;
+        $this->TrueApi = new TrueApi(array(
+            'log-print-level' => 'debug',
+        ));
         $this->TrueApi->auth('kevin',
             file_get_contents(DIR_PLAY_ROOT.'/pw'),
             file_get_contents(DIR_PLAY_ROOT.'/apikey'),
@@ -46,6 +48,25 @@ class Play {
             'apiFormat', 'json',
         ));
 
+//        "relatie_id":"1378",
+//        "catalog_sla_id":"5",
+//        "server_id":"3736",
+//        "hostname":"dhcp.true.nl",
+//        "primary_ip":""
+//
+        
+        $x = $this->TrueApi->PharosNotifications->store(array(
+            '[1][pharos_scanner_id]' => '1',
+            '[1][pharos_data_id]' => '567101645',
+            '[1][relatie_id]' => '1378',
+            '[1][server_id]' => '3736',
+            '[1][port]' => 'ssh',
+            '[1][status]' => 'down',
+            '[1][sent]' => '6',
+            '[1][mstamp]' => '2009-11-20 13:31:14',
+            '[1][stamp]' => '2009-11-20 13:31:20',
+        ));
+        prd($x);
 
         prd($this->TrueApi->rest('put', 'servers/edit/2313', array('color' => 'black')));
 
