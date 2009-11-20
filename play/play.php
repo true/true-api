@@ -47,24 +47,28 @@ class Play {
             'returnData' => false,
             'apiFormat', 'json',
         ));
-
-//        "relatie_id":"1378",
-//        "catalog_sla_id":"5",
-//        "server_id":"3736",
-//        "hostname":"dhcp.true.nl",
-//        "primary_ip":""
-//
         
         $x = $this->TrueApi->PharosNotifications->store(array(
-            '[1][pharos_scanner_id]' => '1',
-            '[1][pharos_data_id]' => '567101645',
-            '[1][relatie_id]' => '1378',
-            '[1][server_id]' => '3736',
-            '[1][port]' => 'ssh',
-            '[1][status]' => 'down',
-            '[1][sent]' => '6',
-            '[1][mstamp]' => '2009-11-20 13:31:14',
-            '[1][stamp]' => '2009-11-20 13:31:20',
+            1 => array(
+                'pharos_data_id' => '567101645',
+                'relatie_id' => '1378',
+                'server_id' => '3736',
+                'port' => 'ssh',
+                'status' => 'down',
+                'sent' => '6',
+                'mstamp' => '2009-11-20 13:31:14',
+                'stamp' => '2009-11-20 13:31:20',
+            ),
+            2 => array(
+                'pharos_data_id' => '567101645',
+                'relatie_id' => '1378',
+                'server_id' => '3736',
+                'port' => 'ssh',
+                'status' => 'down',
+                'sent' => '6',
+                'mstamp' => '2009-11-20 13:31:14',
+                'stamp' => '2009-11-20 13:31:20',
+            ),
         ));
         prd($x);
 
