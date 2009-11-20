@@ -26,12 +26,16 @@ class TrueApiControllerTest extends PHPUnit_Framework_TestCase
     }
     
     public function testIndex()
-    {
-        $callbackArgs = $this->TrueApiController->index();
-        $this->assertSame('get', $callbackArgs['method']);
-        $this->assertSame('servers/index', $callbackArgs['path']);
-        $this->assertType('array', $callbackArgs['vars']);
-        $this->assertTrue(count($callbackArgs['vars']) === 0);
+    {   
+        $actual   = $this->TrueApiController->index();
+        $expected = array (
+            'method' => 'get',
+            'path' => 'servers/index',
+            'vars' => array(
+
+            ),
+        );
+        $this->assertSame($expected, $actual);
     }
 }
 
