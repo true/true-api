@@ -6,3 +6,5 @@ etc/AppConfig.config.php
 etc/pharos_scanner_id
 modules/data/*.sql
 modules/settings.dat
+play/pw
+play/apikey

@@ -1,42 +1,44 @@
 <?php
 class TrueApiController {
-    public $TrueApi;
-    public $controller;
-    public function __construct($controller, $apiObject) {
-        $this->TrueApi = $apiObject;
+    protected $_callback;
+    public    $controller;
+    
+    public function __construct($controller, $callback) {
+        $this->_callback  = $callback;
         $this->controller = $controller;
     }
 
+    protected function _rest($method, $action, $vars) {
+        $method = str_replace('_', '', $method);
+        return call_user_func_array($this->_callback,
+            array($method, sprintf('%s/%s', $this->controller, $action), $vars));
+    }
+
     protected function _get($action, $vars) {
-        $path = sprintf('%s/%s', $this->controller, $action);
-        return $this->TrueApi->get($path, $vars);
+        return $this->_rest(__FUNCTION__, $action, $vars);
     }
     protected function _put($action, $vars) {
-        $path = sprintf('%s/%s', $this->controller, $action);
-        return $this->TrueApi->put($path, $vars);
+        return $this->_rest(__FUNCTION__, $action, $vars);
+    }
+    protected function _post($action, $vars) {
+        return $this->_rest(__FUNCTION__, $action, $vars);
     }
     protected function _delete($action, $vars) {
-        $path = sprintf('%s/%s', $this->controller, $action);
-        return $this->TrueApi->delete($path, $vars);
+        return $this->_rest(__FUNCTION__, $action, $vars);
     }
     
     public function monitored($vars = array()) {
         return $this->_get(__FUNCTION__, $vars);
     }
-
     public function index($vars = array()) {
         return $this->_get(__FUNCTION__, $vars);
     }
-    
     public function view($id, $vars = array()) {
-        return $this->_get(__FUNCTION__.'/'.$id, $vars);
+        return $this->_get(sprintf('%s/%s', __FUNCTION__, $id), $vars);
     }
-    
     public function edit($id, $vars = array()) {
-        $vars = array('data' => $vars);
-        return $this->_put(__FUNCTION__.'/'.$id, $vars);
+        return $this->_put(sprintf('%s/%s', __FUNCTION__, $id), $vars);
     }
-
     public function delete($id, $vars = array()) {
         #return $this->_delete(__FUNCTION__.'/'.$id, $vars);
     }

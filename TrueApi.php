@@ -23,12 +23,12 @@ require_once DIR_TRUEAPI_ROOT.'/Xml.php';
 require_once DIR_RESTCLIENT_ROOT.'/RestClient.php';
 
 class TrueApi extends Base {
-    public    $RestClient   = false;
     public    $Xml;
-    protected $_apiApp      = 'True Api';
-    protected $_apiVer      = '0.1';
-    protected $_auth        = array();
-    protected $_controllers = array(
+    public    $RestClient     = false;
+    protected $_apiApp        = 'True Api';
+    protected $_apiVer        = '0.1';
+    protected $_authorization = array();
+    public    $controllers    = array(
         'servers',
         'dns_domains',
     );
@@ -38,15 +38,16 @@ class TrueApi extends Base {
         'returnData' => false,
 
         'log-file' => '/var/log/true-api.log',
+        'log-break-level' => 'crit',
         'app-root' => DIR_TRUEAPI_ROOT,
         'class-autobind' => true,
         'class-autosetup' => true,
     );
 
     public function __setup() {
-        foreach ($this->_controllers as $controller) {
+        foreach ($this->controllers as $controller) {
             $model = $this->classify($controller);
-            $this->{$model} = new TrueApiController($controller, $this);
+            $this->{$model} = new TrueApiController($controller, array($this, 'rest'));
         }
     }
 
@@ -61,81 +62,68 @@ class TrueApi extends Base {
      * @return <type>
      */
     public function auth($username, $password, $apikey, $class = 'Customer') {
-        $this->_auth = compact('username', 'password', 'apikey', 'class');
-        return true;
+        $query       = http_build_query(compact('username', 'password', 'apikey', 'class'));
+        return ($this->_authorization = sprintf('TRUEREST %s', $query));
     }
 
-    protected function _invalidResponse($dump = '') {
-        $this->debug('Received invalid response: %s', $dump);
-        $this->err('Invalid response from server');
-
-        return false;
+    protected function _invalidResponse($dump = '', $reason = '') {
+        if ($reason) $reason = ' .'.$reason;
+        $this->debug('Received invalid response%s: %s',$reason, $dump);
+        return $this->err('Invalid response from server');
     }
 
-    protected function _handleResponse($response) {
-        if (!is_array(@$response['meta']['feedback'])) {
-            return $this->_invalidResponse($response);
+    public function response($parsed) {
+        if (!is_array(@$parsed['meta']['feedback'])) {
+            return $this->_invalidResponse($parsed, 'No feedback array');
         }
-        if (!is_array(@$response['data'])) {
-            return $this->_invalidResponse($response);
+        if (!is_array(@$parsed['data'])) {
+            return $this->_invalidResponse($parsed, 'No data');
         }
         
-        foreach ($response['meta']['feedback'] as $feedback) {
+        foreach ($parsed['meta']['feedback'] as $feedback) {
             if ($feedback['level'] === 'error') {
                 $this->warning('Server said: %s', $feedback['message']);
             }
         }
 
-        if ($response['meta']['status'] === 'error') {
+        if ($parsed['meta']['status'] === 'error') {
             return false;
         }
 
         if ($this->opt('returnData')) {
-            return $response['data'];
+            return $parsed['data'];
         }
-
-        return $response;
+        
+        return $parsed;
     }
     
     public function parseJson($curlResponse) {
         if (!isset($curlResponse->body)) {
-            return $this->_invalidResponse($curlResponse);
+            return $this->_invalidResponse($curlResponse, 'No body in curl response');
         }
-        
-        $body     = $curlResponse->body;
-        $response = json_decode($body, true);
 
-        return $this->_handleResponse($response);
+        if (false === ($response = json_decode($curlResponse->body, true))) {
+            return $this->_invalidResponse($curlResponse, 'json parse error');
+        }
+
+        return $response;
     }
 
     public function parseXml($curlResponse) {
         if (!isset($curlResponse->body)) {
-            return $this->_invalidResponse($curlResponse);
-        }
-        $body = $curlResponse->body;
-
-        // @todo: A better Unserialize XML:
-        if (!($response = $this->Xml->parse($body))) {
-            return $this->_invalidResponse($curlResponse);
+            return $this->_invalidResponse($curlResponse, 'No body in curl response');
         }
         
-        return $this->_handleResponse($response);
+        // @todo: A working Unserialize XML:
+        if (false === ($response = $this->Xml->parse($curlResponse->body))) {
+            return $this->_invalidResponse($curlResponse, 'XML parse error');
+        }
+        
+        return $response;
     }
-
-    /**
-     * Pass unmatched calls through to RestClient
-     *
-     * @param string $name
-     * @param array  $args
-     *
-     * @return mixed
-     */
-    public function  __call($name,  $args) {
-        return $this->_request($name, $args);
-    }
-
-    protected function _request($name, $args) {
-        // Permanent options
+    
+    public function rest($method, $path, $vars) {
+        // Permanent setup
         if (!$this->RestClient) {
             $restOpts = array(
                 'userAgent' => sprintf('%s v%s', $this->_apiApp, $this->_apiVer),
@@ -145,27 +133,33 @@ class TrueApi extends Base {
             $this->RestClient->add_response_type('xml', array($this, 'parseXml'), '.xml');
         }
 
-        // Dynamic options
-        if ($this->opt('apiFormat') == 'xml') {
-            $this->err('XML Not yet supported');
+        // Validate
+        if (!method_exists($this->RestClient, $method)) {
+            return $this->err('Rest method "%s" does not exist.', $method);
         }
+        if (empty($this->_authorization)) {
+            return $this->err('You need to set proper authentication first.');
+        }
+
+        // Dynamic options
+        if (strtolower($this->opt('apiFormat')) == 'xml') {
+            return $this->err('XML Not yet supported');
+        }
+        $this->RestClient->headers('Authorization', $this->_authorization);
         $this->RestClient->set_response_type($this->opt('apiFormat'));
         $this->RestClient->request_prefix = $this->opt('apiService');
         $this->RestClient->request_suffix = '.'.$this->opt('apiFormat');
 
-        // Make the call
-        if (!method_exists($this->RestClient, $name)) {
-            return $this->err('Method %s does not exist.', $name);
-        }
-        if (empty($this->_auth)) {
-            return $this->err('You need to set proper authentication first with ->auth().');
+        // Wrap any data in the data var
+        if (!empty($vars)) {
+            $vars = array('data' => $vars);
         }
 
-        $query       = http_build_query($this->_auth);
-        $this->RestClient->headers('Authorization', sprintf('TRUEREST %s', $query));
-        
-        return call_user_func_array(array($this->RestClient, $name),
-            $args);
+        // Make the call
+        $parsed = call_user_func(array($this->RestClient, $method), $path, $vars);
+
+        // Return response
+        return $this->response($parsed);
     }
 }
 ?>
