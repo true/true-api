@@ -38,6 +38,7 @@ class TrueApiTest extends PHPUnit_Framework_TestCase
         foreach ($this->TrueApi->controllers as $controller) {
             $model = $this->TrueApi->classify($controller);
             $this->assertTrue(is_object($this->TrueApi->{$model}));
+            $this->assertTrue(method_exists($this->TrueApi->{$model}, 'index'));
         }
     }
 

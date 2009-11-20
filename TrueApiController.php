@@ -43,4 +43,3 @@ class TrueApiController {
         #return $this->_delete(__FUNCTION__.'/'.$id, $vars);
     }
 }
-?>
