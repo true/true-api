@@ -99,7 +99,11 @@ class TrueApi extends Base {
     }
     
     public function parseJson($curlResponse) {
-        #prd($curlResponse);
+        if (empty($curlResponse)) {
+            // Should be handled by next step in ->rest()
+            return $curlResponse;
+        }
+
         if (!isset($curlResponse->body)) {
             return $this->_invalidResponse($curlResponse, 'No body in curl response');
         }
@@ -112,6 +116,11 @@ class TrueApi extends Base {
     }
 
     public function parseXml($curlResponse) {
+        if (empty($curlResponse)) {
+            // Should be handled by next step in ->rest()
+            return $curlResponse;
+        }
+
         if (!isset($curlResponse->body)) {
             return $this->_invalidResponse($curlResponse, 'No body in curl response');
         }
@@ -159,6 +168,14 @@ class TrueApi extends Base {
 
         // Make the call
         $parsed = call_user_func(array($this->RestClient, $method), $path, $vars);
+
+        if (!empty($this->RestClient->error)) {
+            $this->err($this->RestClient->error);
+        }
+
+        if (false === $parsed) {
+            return false;
+        }
 
         // Return response
         return $this->response($parsed);
