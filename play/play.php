@@ -56,8 +56,10 @@ class Play {
 //        die()
 
 
-        $x = $this->TrueApi->Servers->edit(2313, array('color' => 'blue', 'os_serial' => 'x'));
+        $x = $this->TrueApi->Servers->edit(2862, array('relatie_id' => 1378));
+        
         #$w = $this->TrueApi->Servers->index();
+
 
         prd(compact('x', 'w'));
 
