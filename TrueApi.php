@@ -33,6 +33,7 @@ class TrueApi extends Base {
     protected $_options     = array(
         'apiService' => 'http://www.truecare.dev/cakephp/',
         'apiFormat' => 'json',
+        'verifySSL' => true,
         'returnData' => false,
         'fetchControllers' => true,
 
@@ -209,6 +210,7 @@ class TrueApi extends Base {
         // Permanent setup
         if (!$this->RestClient) {
             $restOpts = array(
+                'verifySSL' => $this->opt('verifySSL'),
                 'cookieFile' => false,
                 'userAgent' => sprintf('%s v%s',
                     $this->_apiApp, $this->_apiVer),

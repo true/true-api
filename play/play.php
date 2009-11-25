@@ -35,12 +35,13 @@ class Play {
     public function  __construct() {
         $this->TrueApi = new TrueApi(array(
             'log-print-level' => 'debug',
+            'verifySSL' => false,
         ));
         // 'apiService' => 'http://admin.true.dev/cakephp/',
         $this->TrueApi->auth('1823',
             file_get_contents(DIR_PLAY_ROOT.'/pw'),
             file_get_contents(DIR_PLAY_ROOT.'/apikey')
-            ); // , 'Employee'
+        ); // , 'Employee'
     }
     
     public function main() {
