@@ -56,9 +56,10 @@ class Play {
 //        die()
 
 
-        $w = $this->TrueApi->Servers->index();
+        $x = $this->TrueApi->Servers->edit(2313, array('color' => 'blue', 'os_serial' => 'x'));
+        #$w = $this->TrueApi->Servers->index();
 
-        prd(compact('w'));
+        prd(compact('x', 'w'));
 
 
 
@@ -66,7 +67,6 @@ class Play {
 
         $this->TrueApi->Servers->apiBuffer(true);
         $w = $this->TrueApi->Servers->add(array('color' => 'gray', 'os_serial' => 'x'));
-        $x = $this->TrueApi->Servers->edit(2313, array('color' => 'gray', 'os_serial' => 'x'));
         $y = $this->TrueApi->Servers->edit(2313, array('color' => 'gray', 'os_serial' => 'x'));
         $z = $this->TrueApi->Servers->apiBuffer('flush');
         pr(compact('w', 'x', 'y', 'z'));
