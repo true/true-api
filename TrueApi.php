@@ -137,10 +137,15 @@ class TrueApi extends Base {
             return $this->_badResponse($parsed, 'No data');
         }
         
+        $fail = false;
         foreach ($parsed['meta']['feedback'] as $feedback) {
             if ($feedback['level'] === 'error') {
+                $fail = true;
                 $this->warning('Server said: %s', $feedback['message']);
             }
+        }
+        if ($fail) {
+            return $this->crit('Can\'t continue after this');
         }
 
         if ($parsed['meta']['status'] === 'error') {
@@ -204,6 +209,7 @@ class TrueApi extends Base {
         // Permanent setup
         if (!$this->RestClient) {
             $restOpts = array(
+                'cookieFile' => false,
                 'userAgent' => sprintf('%s v%s',
                     $this->_apiApp, $this->_apiVer),
             );
