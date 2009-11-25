@@ -57,8 +57,9 @@ class Play {
         $w = $this->TrueApi->Servers->add(array('color' => 'gray', 'os_serial' => 'x'));
         $x = $this->TrueApi->Servers->edit(2313, array('color' => 'gray', 'os_serial' => 'x'));
         $y = $this->TrueApi->Servers->edit(2313, array('color' => 'gray', 'os_serial' => 'x'));
-        pr(compact('w', 'x', 'y'));
-        $this->TrueApi->Servers->apiUnleash();
+        $z = $this->TrueApi->Servers->apiUnleash();
+        pr(compact('w', 'x', 'y', 'z'));
+
 
         die();
 

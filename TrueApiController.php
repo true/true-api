@@ -67,14 +67,17 @@ class TrueApiController {
         if (empty($this->buffer)) {
             return $this->err('Buffer is empty');
         }
-
+        if (count($this->buffer) > 1) {
+            return $this->err('Buffer can only contain 1 kind of bulk action. '.
+                'e.g. Dont mix deletes with edits.');
+        }
         foreach($this->buffer as $bulkaction=>$vars) {
-            if (false === call_user_func(array($this, $bulkaction), $vars)) {
+            if (false === ($res = call_user_func(array($this, $bulkaction), $vars))) {
                 return false;
             }
         }
 
-        return true;
+        return $res;
     }
 
     /**
