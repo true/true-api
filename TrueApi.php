@@ -124,17 +124,17 @@ class TrueApi extends Base {
         return $this->_authorization;
     }
 
-    protected function _invalidResponse($dump = '', $reason = 'no reason') {
+    protected function _badResponse($dump = '', $reason = 'no reason') {
         $this->debug('Received invalid response: %s', $dump);
         return $this->err('Invalid response from server: %s', $reason);
     }
     
     public function response($parsed) {
         if (!is_array(@$parsed['meta']['feedback'])) {
-            return $this->_invalidResponse($parsed, 'No feedback array');
+            return $this->_badResponse($parsed, 'No feedback array');
         }
         if (!is_array(@$parsed['data'])) {
-            return $this->_invalidResponse($parsed, 'No data');
+            return $this->_badResponse($parsed, 'No data');
         }
         
         foreach ($parsed['meta']['feedback'] as $feedback) {
@@ -161,12 +161,12 @@ class TrueApi extends Base {
         }
 
         if (!isset($curlResponse->body)) {
-            return $this->_invalidResponse($curlResponse,
+            return $this->_badResponse($curlResponse,
                 'No body in curl response');
         }
 
         if ($curlResponse->body === '') {
-            return $this->_invalidResponse($curlResponse,
+            return $this->_badResponse($curlResponse,
                 'Empty body in curl response');
         }
 
@@ -178,9 +178,10 @@ class TrueApi extends Base {
             return false;
         }
 
-        if (!is_array($response = json_decode($curlResponse->body, true))) {
-            return $this->_invalidResponse($curlResponse->body,
+        if (!is_array(($response = json_decode($curlResponse->body, true)))) {
+            return $this->_badResponse($curlResponse->body,
                 'json parse error');
+
         }
 
         return $response;
@@ -193,7 +194,7 @@ class TrueApi extends Base {
         
         // @todo: A working Unserialize XML:
         if (false === ($response = $this->Xml->parse($curlResponse->body))) {
-            return $this->_invalidResponse($curlResponse, 'XML parse error');
+            return $this->_badResponse($curlResponse, 'XML parse error');
         }
         
         return $response;

@@ -54,7 +54,11 @@ class Play {
 //        die()
 
 
-        
+        $w = $this->TrueApi->Servers->sla();
+
+        prd(compact('w'));
+
+
 
         die();
 
