@@ -31,7 +31,7 @@ class TrueApi extends Base {
     public    $controllers    = array(
     );
     protected $_options     = array(
-        'apiService' => 'http://www.truecare.dev/cakephp/',
+        'apiService' => 'http://cake.truecare.dev/cakephp/',
         'apiFormat' => 'json',
         'verifySSL' => true,
         'returnData' => false,
@@ -140,9 +140,9 @@ class TrueApi extends Base {
         
         $fail = false;
         foreach ($parsed['meta']['feedback'] as $feedback) {
+            $this->log($feedback['level'], 'server-side: %s', $feedback['message']);
             if ($feedback['level'] === 'error') {
                 $fail = true;
-                $this->err('Server said: %s', $feedback['message']);
             }
         }
         if ($fail) {
