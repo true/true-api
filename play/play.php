@@ -46,11 +46,22 @@ class Play {
         $this->TrueApi->opt(array(
             'returnData' => false,
             'apiFormat', 'json',
+            'buffer' => true,
         ));
 //
 //        $x = $this->TrueApi->ApiControllers->index();
 //        #prd($x);
 //        die()
+
+        $this->TrueApi->Servers->apiBuffer(true);
+        $w = $this->TrueApi->Servers->add(array('color' => 'gray', 'os_serial' => 'x'));
+        $x = $this->TrueApi->Servers->edit(2313, array('color' => 'gray', 'os_serial' => 'x'));
+        $y = $this->TrueApi->Servers->edit(2313, array('color' => 'gray', 'os_serial' => 'x'));
+        pr(compact('w', 'x', 'y'));
+        $this->TrueApi->Servers->apiUnleash();
+
+        die();
+
         $x = $this->TrueApi->PharosNotifications->store(array(
             1 => array(
                 'pharos_data_id' => '567101645',

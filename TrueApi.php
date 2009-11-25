@@ -49,11 +49,13 @@ class TrueApi extends Base {
      *
      * @return boolean
      */
-    public function controllers() {
-        $this->ApiControllers = new TrueApiController('api_controllers', array($this, 'rest'));
+    public function buildControllers() {
+        $this->ApiControllers = new TrueApiController('api_controllers',
+            array($this, 'rest'));
 
         $this->debug('Retrieving possible controllers');
-        $this->controllers = $this->data($this->ApiControllers->index(), 'controllers');
+        $this->controllers = $this->data($this->ApiControllers->index(),
+            'controllers');
 
         if (!$this->controllers) {
             return $this->err('Unable to fetch controllers');
@@ -65,7 +67,8 @@ class TrueApi extends Base {
             if (isset($this->{$class}) && is_object($this->{$class})) {
                 continue;
             }
-            $this->{$class} = new TrueApiController($underscore, array($this, 'rest'));
+            $this->{$class} = new TrueApiController($underscore,
+                array($this, 'rest'));
         }
         
         return true;
@@ -105,11 +108,16 @@ class TrueApi extends Base {
      * @return <type>
      */
     public function auth($username, $password, $apikey, $class = 'Customer') {
-        $query = http_build_query(compact('username', 'password', 'apikey', 'class'));
+        $query = http_build_query(compact(
+            'username',
+            'password',
+            'apikey',
+            'class'
+        ));
         $this->_authorization = sprintf('TRUEREST %s', $query);
 
         if ($this->opt('fetchControllers')) {
-            $this->controllers();
+            $this->buildControllers();
         }
 
         // easy for testing:
@@ -153,11 +161,13 @@ class TrueApi extends Base {
         }
 
         if (!isset($curlResponse->body)) {
-            return $this->_invalidResponse($curlResponse, 'No body in curl response');
+            return $this->_invalidResponse($curlResponse,
+                'No body in curl response');
         }
 
         if ($curlResponse->body === '') {
-            return $this->_invalidResponse($curlResponse, 'Empty body in curl response');
+            return $this->_invalidResponse($curlResponse,
+                'Empty body in curl response');
         }
 
         return $curlResponse->body;
@@ -169,7 +179,8 @@ class TrueApi extends Base {
         }
 
         if (!is_array($response = json_decode($curlResponse->body, true))) {
-            return $this->_invalidResponse($curlResponse->body, 'json parse error');
+            return $this->_invalidResponse($curlResponse->body,
+                'json parse error');
         }
 
         return $response;
@@ -192,11 +203,14 @@ class TrueApi extends Base {
         // Permanent setup
         if (!$this->RestClient) {
             $restOpts = array(
-                'userAgent' => sprintf('%s v%s', $this->_apiApp, $this->_apiVer),
+                'userAgent' => sprintf('%s v%s',
+                    $this->_apiApp, $this->_apiVer),
             );
             $this->RestClient = new RestClient(false, false, $restOpts);
-            $this->RestClient->add_response_type('json', array($this, 'parseJson'), '.json');
-            $this->RestClient->add_response_type('xml', array($this, 'parseXml'), '.xml');
+            $this->RestClient->add_response_type('json',
+                array($this, 'parseJson'), '.json');
+            $this->RestClient->add_response_type('xml',
+                array($this, 'parseXml'), '.xml');
         }
 
         // Validate
@@ -224,7 +238,8 @@ class TrueApi extends Base {
         $this->debug('requesting path: %s', $path);
 
         // Make the call
-        $parsed = call_user_func(array($this->RestClient, $method), $path, $vars);
+        $parsed = call_user_func(array($this->RestClient, $method),
+            $path, $vars);
 
         if (!empty($this->RestClient->error)) {
             return $this->err($this->RestClient->error);
@@ -236,6 +251,12 @@ class TrueApi extends Base {
 
         // Return response
         return $this->response($parsed);
+    }
+
+    public function unleash() {
+        foreach($this->controllers as $class) {
+            pr($this->{$class}->buffer);
+        }
     }
 }
 ?>
