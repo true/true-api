@@ -29,14 +29,12 @@ class TrueApi extends Base {
     protected $_apiVer        = '0.1';
     protected $_authorization = array();
     public    $controllers    = array(
-        'servers',
-        'dns_domains',
-        'pharos_notifications',
     );
     protected $_options     = array(
         'apiService' => 'http://admin.true.dev/cakephp/',
         'apiFormat' => 'json',
         'returnData' => false,
+        'fetchControllers' => true,
 
         'log-file' => '/var/log/true-api.log',
         'log-break-level' => 'crit',
@@ -45,15 +43,59 @@ class TrueApi extends Base {
         'class-autosetup' => true,
     );
 
-    public function __setup() {
-        foreach ($this->controllers as $controller) {
-            $model = $this->classify($controller);
-            $this->{$model} = new TrueApiController($controller, array($this, 'rest'));
+    /**
+     * Loads a remote list of controllers and sets them up as
+     * child objects for easy interaction.
+     *
+     * @return boolean
+     */
+    public function controllers() {
+        $this->ApiControllers = new TrueApiController('api_controllers', array($this, 'rest'));
+
+        $this->debug('Retrieving possible controllers');
+        $this->controllers = $this->data($this->ApiControllers->index(), 'controllers');
+
+        if (!$this->controllers) {
+            return $this->err('Unable to fetch controllers');
         }
+
+        foreach ($this->controllers as $controller) {
+            $underscore = $this->underscore($controller);
+            $class = $this->camelize($underscore);
+            if (isset($this->{$class}) && is_object($this->{$class})) {
+                continue;
+            }
+            $this->{$class} = new TrueApiController($underscore, array($this, 'rest'));
+        }
+        
+        return true;
     }
 
     /**
-     * Set authentication
+     * Finds the data with in an array. Optionally narrow down to
+     * one key in that data.
+     *
+     * @param array  $data
+     * @param mixed null or string $key
+     *
+     * @return array
+     */
+    public function data($data, $key = null) {
+        if (isset($data['data'])) {
+            $data = $data['data'];
+        }
+
+        if ($key !== null) {
+            if (isset($data[$key])) {
+                $data = $data[$key];
+            }
+        }
+        
+        return $data;
+    }
+
+    /**
+     * Set authentication & loads controllers
      *
      * @param <type> $username Your truecare username
      * @param <type> $password Your truecare password
@@ -63,16 +105,22 @@ class TrueApi extends Base {
      * @return <type>
      */
     public function auth($username, $password, $apikey, $class = 'Customer') {
-        $query       = http_build_query(compact('username', 'password', 'apikey', 'class'));
-        return ($this->_authorization = sprintf('TRUEREST %s', $query));
+        $query = http_build_query(compact('username', 'password', 'apikey', 'class'));
+        $this->_authorization = sprintf('TRUEREST %s', $query);
+
+        if ($this->opt('fetchControllers')) {
+            $this->controllers();
+        }
+
+        // easy for testing:
+        return $this->_authorization;
     }
 
-    protected function _invalidResponse($dump = '', $reason = '') {
-        if ($reason) $reason = ' .'.$reason;
-        $this->debug('Received invalid response%s: %s',$reason, $dump);
-        return $this->err('Invalid response from server');
+    protected function _invalidResponse($dump = '', $reason = 'no reason') {
+        $this->debug('Received invalid response: %s', $dump);
+        return $this->err('Invalid response from server: %s', $reason);
     }
-
+    
     public function response($parsed) {
         if (!is_array(@$parsed['meta']['feedback'])) {
             return $this->_invalidResponse($parsed, 'No feedback array');
@@ -97,8 +145,8 @@ class TrueApi extends Base {
         
         return $parsed;
     }
-    
-    public function parseJson($curlResponse) {
+
+    public function preParse($curlResponse) {
         if (empty($curlResponse)) {
             // Should be handled by next step in ->rest()
             return $curlResponse;
@@ -106,6 +154,18 @@ class TrueApi extends Base {
 
         if (!isset($curlResponse->body)) {
             return $this->_invalidResponse($curlResponse, 'No body in curl response');
+        }
+
+        if ($curlResponse->body === '') {
+            return $this->_invalidResponse($curlResponse, 'Empty body in curl response');
+        }
+
+        return $curlResponse->body;
+    }
+
+    public function parseJson($curlResponse) {
+        if (false === ($body = $this->preParse($curlResponse))) {
+            return false;
         }
 
         if (!is_array($response = json_decode($curlResponse->body, true))) {
@@ -116,13 +176,8 @@ class TrueApi extends Base {
     }
 
     public function parseXml($curlResponse) {
-        if (empty($curlResponse)) {
-            // Should be handled by next step in ->rest()
-            return $curlResponse;
-        }
-
-        if (!isset($curlResponse->body)) {
-            return $this->_invalidResponse($curlResponse, 'No body in curl response');
+        if (false === ($body = $this->preParse($curlResponse))) {
+            return false;
         }
         
         // @todo: A working Unserialize XML:
@@ -165,16 +220,18 @@ class TrueApi extends Base {
         if (!empty($vars)) {
             $vars = array('data' => $vars);
         }
+        
+        $this->debug('requesting path: %s', $path);
 
         // Make the call
         $parsed = call_user_func(array($this->RestClient, $method), $path, $vars);
 
         if (!empty($this->RestClient->error)) {
-            $this->err($this->RestClient->error);
+            return $this->err($this->RestClient->error);
         }
 
         if (false === $parsed) {
-            return false;
+            return $this->err('Parse error');
         }
 
         // Return response

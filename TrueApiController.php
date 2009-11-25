@@ -14,7 +14,7 @@ class TrueApiController {
             array($method, sprintf('%s/%s', $this->controller, $action), $vars));
     }
 
-    protected function _get($action, $vars) {
+    protected function _get($action, $vars = array()) {
         return $this->_rest(__FUNCTION__, $action, $vars);
     }
     protected function _put($action, $vars) {
@@ -26,16 +26,31 @@ class TrueApiController {
     protected function _delete($action, $vars) {
         return $this->_rest(__FUNCTION__, $action, $vars);
     }
+
+    /**
+     * Read functions
+     *
+     * @param <type> $name
+     * @param <type> $arguments
+     * 
+     * @return <type>
+     */
+    public function  __call($name,  $arguments) {
+        if (count($arguments) === 0) {
+            // Index methods
+            return $this->_get($name);
+        } elseif (count($arguments) === 1) {
+            // View methods
+            return $this->_get(sprintf('%s/%s', $name, $arguments[0]));
+        }
+        // Index methods
+        if (count($arguments) === 0) {
+            return $this->_get($name, $vars);
+        }
+
+        return false;
+    }
     
-    public function monitored($vars = array()) {
-        return $this->_get(__FUNCTION__, $vars);
-    }
-    public function index($vars = array()) {
-        return $this->_get(__FUNCTION__, $vars);
-    }
-    public function view($id, $vars = array()) {
-        return $this->_get(sprintf('%s/%s', __FUNCTION__, $id), $vars);
-    }
     public function edit($id, $vars = array()) {
         return $this->_put(sprintf('%s/%s', __FUNCTION__, $id), $vars);
     }

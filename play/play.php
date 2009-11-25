@@ -47,7 +47,10 @@ class Play {
             'returnData' => false,
             'apiFormat', 'json',
         ));
-        
+//
+//        $x = $this->TrueApi->ApiControllers->index();
+//        #prd($x);
+//        die()
         $x = $this->TrueApi->PharosNotifications->store(array(
             1 => array(
                 'pharos_data_id' => '567101645',
