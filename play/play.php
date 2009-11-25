@@ -36,7 +36,8 @@ class Play {
         $this->TrueApi = new TrueApi(array(
             'log-print-level' => 'debug',
         ));
-        $this->TrueApi->auth('kevin',
+        // 'apiService' => 'http://admin.true.dev/cakephp/',
+        $this->TrueApi->auth('1823',
             file_get_contents(DIR_PLAY_ROOT.'/pw'),
             file_get_contents(DIR_PLAY_ROOT.'/apikey')
             ); // , 'Employee'

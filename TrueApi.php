@@ -31,7 +31,7 @@ class TrueApi extends Base {
     public    $controllers    = array(
     );
     protected $_options     = array(
-        'apiService' => 'http://admin.true.dev/cakephp/',
+        'apiService' => 'http://www.truecare.dev/cakephp/',
         'apiFormat' => 'json',
         'returnData' => false,
         'fetchControllers' => true,
@@ -141,7 +141,7 @@ class TrueApi extends Base {
         foreach ($parsed['meta']['feedback'] as $feedback) {
             if ($feedback['level'] === 'error') {
                 $fail = true;
-                $this->warning('Server said: %s', $feedback['message']);
+                $this->err('Server said: %s', $feedback['message']);
             }
         }
         if ($fail) {
@@ -249,21 +249,15 @@ class TrueApi extends Base {
             $path, $vars);
 
         if (!empty($this->RestClient->error)) {
-            return $this->err($this->RestClient->error);
+            return $this->crit($this->RestClient->error);
         }
 
         if (false === $parsed) {
-            return $this->err('Parse error');
+            return $this->err('a parse error occured');
         }
 
         // Return response
         return $this->response($parsed);
-    }
-
-    public function unleash() {
-        foreach($this->controllers as $class) {
-            pr($this->{$class}->buffer);
-        }
     }
 }
 ?>
