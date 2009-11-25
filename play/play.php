@@ -38,8 +38,8 @@ class Play {
         ));
         $this->TrueApi->auth('kevin',
             file_get_contents(DIR_PLAY_ROOT.'/pw'),
-            file_get_contents(DIR_PLAY_ROOT.'/apikey'),
-            'Employee');
+            file_get_contents(DIR_PLAY_ROOT.'/apikey')
+            ); // , 'Employee'
     }
     
     public function main() {
@@ -53,11 +53,16 @@ class Play {
 //        #prd($x);
 //        die()
 
+
+        
+
+        die();
+
         $this->TrueApi->Servers->apiBuffer(true);
         $w = $this->TrueApi->Servers->add(array('color' => 'gray', 'os_serial' => 'x'));
         $x = $this->TrueApi->Servers->edit(2313, array('color' => 'gray', 'os_serial' => 'x'));
         $y = $this->TrueApi->Servers->edit(2313, array('color' => 'gray', 'os_serial' => 'x'));
-        $z = $this->TrueApi->Servers->apiUnleash();
+        $z = $this->TrueApi->Servers->apiBuffer('flush');
         pr(compact('w', 'x', 'y', 'z'));
 
 

@@ -10,8 +10,9 @@ class TrueApiController {
     }
 
     /**
-     * ->buffer(true) turns on buffering. false turns it off.
-     * other parameters will be appended to the actual buffer.
+     * ->buffer(true) turns on buffering, false turns it off,
+     * 'flush' executes. other kind of parameters will be appended to
+     * the actual buffer.
      *
      * @param <type> $action
      * @param <type> $id
@@ -23,6 +24,24 @@ class TrueApiController {
         if ($action === true) {
             $this->buffer = array();
             return null;
+        } 
+        if ($action === 'flush') {
+            if (empty($this->buffer)) {
+                return $this->err('Buffer is empty');
+            }
+            if (count($this->buffer) > 1) {
+                return $this->err('Buffer can only contain 1 kind of '.
+                    ' bulk action. e.g. Don\'t mix deletes with edits.');
+            }
+            
+            foreach($this->buffer as $bulkaction=>$vars) {
+                if (false === ($res = call_user_func(array($this, $bulkaction),
+                            $vars))) {
+                    return false;
+                }
+            }
+            
+            return $res;
         }
 
         if (!is_array($this->buffer)) {
@@ -61,23 +80,6 @@ class TrueApiController {
         trigger_error($format,
             E_USER_ERROR);
         return false;
-    }
-
-    public function apiUnleash() {
-        if (empty($this->buffer)) {
-            return $this->err('Buffer is empty');
-        }
-        if (count($this->buffer) > 1) {
-            return $this->err('Buffer can only contain 1 kind of bulk action. '.
-                'e.g. Dont mix deletes with edits.');
-        }
-        foreach($this->buffer as $bulkaction=>$vars) {
-            if (false === ($res = call_user_func(array($this, $bulkaction), $vars))) {
-                return false;
-            }
-        }
-
-        return $res;
     }
 
     /**
