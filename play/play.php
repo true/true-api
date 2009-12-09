@@ -36,11 +36,12 @@ class Play {
         $this->TrueApi = new TrueApi(array(
             'log-print-level' => 'debug',
             'verifySSL' => false,
+            'apiService' => 'http://admin.true.dev/cakephp/',
         ));
-        // 'apiService' => 'http://admin.true.dev/cakephp/',
-        $this->TrueApi->auth('1823',
+        $this->TrueApi->auth('munin',
             file_get_contents(DIR_PLAY_ROOT.'/pw'),
-            file_get_contents(DIR_PLAY_ROOT.'/apikey')
+            file_get_contents(DIR_PLAY_ROOT.'/apikey'),
+            'Employee'
         ); // , 'Employee'
     }
     
@@ -50,10 +51,17 @@ class Play {
             'apiFormat', 'json',
             'buffer' => true,
         ));
+
+        $x = $this->TrueApi->ConfigFiles->view('munin');
+        prd($x);
+
 //
 //        $x = $this->TrueApi->ApiControllers->index();
 //        #prd($x);
 //        die()
+
+
+        die();
 
 
         $x = $this->TrueApi->Servers->edit(2862, array('relatie_id' => 1378));

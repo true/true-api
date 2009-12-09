@@ -8,4 +8,5 @@ modules/data/*.sql
 modules/settings.dat
 play/pw
 play/apikey
+play/apikey2
 play/valid.json
