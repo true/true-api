@@ -109,6 +109,11 @@ class TrueApi extends Base {
      * @return <type>
      */
     public function auth($username, $password, $apikey, $class = 'Customer') {
+        $username = trim($username);
+        $password = trim($password);
+        $apikey   = trim($apikey);
+        $class    = trim($class);
+
         $query = http_build_query(compact(
             'username',
             'password',
