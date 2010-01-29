@@ -131,11 +131,26 @@ class TrueApiController {
         return false;
     }
 
+
+
+    /**
+     * Index. Can't buffer it.
+     *
+     * @param <type> $vars
+     * 
+     * @return <type>
+     */
+    public function index($scope = null, $vars = array()) {
+        // View methods
+        return $this->_get(sprintf('%s%s', __FUNCTION__,
+                is_string($scope) ? '/scope:' . $scope : ''), $vars);
+    }
+
     /**
      * Add. Buffering allowed.
      *
      * @param <type> $vars
-     * 
+     *
      * @return <type>
      */
     public function add($vars = array()) {
