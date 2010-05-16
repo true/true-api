@@ -236,7 +236,7 @@ class TrueApi extends Base {
         }
 
         // Dynamic options
-        if (strtolower($this->opt('apiFormat')) == 'xml') {
+        if (strtolower($this->opt('apiFormat')) === 'xml') {
             return $this->err('XML Not yet supported');
         }
         $this->RestClient->headers('Authorization', $this->_authorization);
@@ -255,6 +255,9 @@ class TrueApi extends Base {
         $parsed = call_user_func(array($this->RestClient, $method),
             $path, $vars);
 
+        if ($this->RestClient->error) {
+            return $this->crit($this->RestClient->error);
+        }
         if (false === $parsed) {
             return $this->err('a parse error occured');
         }

@@ -36,7 +36,7 @@ class Play {
         $this->TrueApi = new TrueApi(array(
             'log-print-level' => 'debug',
             'verifySSL' => false,
-            'apiService' => 'http://admin.true.dev/cakephp/',
+            'apiService' => 'http://admin.true.dev2/cakephp/',
         ));
         $this->TrueApi->auth('munin',
             file_get_contents(DIR_PLAY_ROOT.'/pw'),
@@ -48,7 +48,7 @@ class Play {
     public function main() {
         $this->TrueApi->opt(array(
             'returnData' => false,
-            'apiFormat', 'json',
+            'apiFormat' => 'json',
             'buffer' => true,
         ));
 
