@@ -158,7 +158,7 @@ class TrueApiController {
             return null;
         }
 
-        return $this->_put(sprintf('%s/%s', __FUNCTION__, $id), $vars);
+        return $this->_put(sprintf('%s', __FUNCTION__), $vars);
     }
     /**
      * Edit. Buffering allowed.
