@@ -65,9 +65,6 @@ class Play {
         $servers = $this->TrueApi->Servers->index();
         print_r($servers);
 
-        prd($x);
-
-
         die();
 
         $this->TrueApi->opt(array(
