@@ -255,21 +255,20 @@ class TrueApi extends Base {
         $parsed = call_user_func(array($this->RestClient, $method),
             $path, $vars);
 
-        if ($this->RestClient->error) {
+        if ($parsed) {
+            $response = $this->response($parsed);
+        }
+
+        if (!$parsed && $this->RestClient->error) {
             return $this->crit($this->RestClient->error);
         }
-        if (false === $parsed) {
+        if (!$parsed) {
             return $this->err('a parse error occured');
         }
-
-        // Return response
-        $response = $this->response($parsed);
-
-        if (!empty($this->RestClient->error)) {
+        if ($this->RestClient->error) {
             return $this->crit($this->RestClient->error);
         }
 
         return $response;
     }
 }
-?>
