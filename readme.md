@@ -20,18 +20,17 @@ Let's look at an example how to include & use the Client
     // Include
     require_once '/var/git/true-api/TrueApi.php';
 
-    // Init
-    // in this example the password & apikey are stored
-    // in the code. Note that it's best to keep them outside
-    // yours.
-    $this->TrueApi->auth(
-        '1231',
-        'Pjsadrfj*1',
-        'e89e1e521d0cedc6b96232fd2741addfbe6e69ddf235cedad140b986c200ead8'
-    );
+    // In real life: get credentials from some place safe,
+    // but for the sake of example let's store them here:
+    $account  = '1231';
+    $password = 'Pjsadrfj*1';
+    $apikey   = 'e89e1e521d0cedc6b96232fd2741addfbe6e69ddf235cedad140b986c200ead8';
 
-    // Call
-    $servers = $this->TrueApiCust->Servers->index();
+    // Checks credentials & Initializes all available API objects
+    $TrueApi->auth($account, $password, $apikey);
+
+    // Now we can call API objects directly such as Servers:
+    $servers = $TrueApi->Servers->index();
     print_r($servers);
     ?>
 
