@@ -31,8 +31,8 @@ class TrueApi extends Base {
     public    $controllers    = array(
     );
     protected $_options     = array(
-        'apiService' => 'http://cake.truecare.dev/cakephp/',
-        'apiFormat' => 'json',
+        'service' => 'http://cake.truecare.dev/',
+        'format' => 'json',
         'verifySSL' => true,
         'returnData' => false,
         'fetchControllers' => true,
@@ -236,13 +236,13 @@ class TrueApi extends Base {
         }
 
         // Dynamic options
-        if (strtolower($this->opt('apiFormat')) === 'xml') {
+        if (strtolower($this->opt('format')) === 'xml') {
             return $this->err('XML Not yet supported');
         }
         $this->RestClient->headers('Authorization', $this->_authorization);
-        $this->RestClient->set_response_type($this->opt('apiFormat'));
-        $this->RestClient->request_prefix = $this->opt('apiService');
-        $this->RestClient->request_suffix = '.'.$this->opt('apiFormat');
+        $this->RestClient->set_response_type($this->opt('format'));
+        $this->RestClient->request_prefix = $this->opt('service');
+        $this->RestClient->request_suffix = '.'.$this->opt('format');
 
         // Wrap any data in the data var
         if (!empty($vars)) {
