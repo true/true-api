@@ -33,26 +33,42 @@ if (!function_exists('d')) {
 class Play {
 
     public function  __construct() {
-        $this->TrueApi = new TrueApi(array(
+        $this->TrueApiEmployee = new TrueApi(array(
             'log-print-level' => 'debug',
             'verifySSL' => false,
             'apiService' => 'http://admin.true.dev2/cakephp/',
         ));
-        $this->TrueApi->auth('munin',
+        $this->TrueApiEmployee->auth('munin',
             file_get_contents(DIR_PLAY_ROOT.'/pw'),
             file_get_contents(DIR_PLAY_ROOT.'/apikey'),
             'Employee'
         ); // , 'Employee'
+        
+        $this->TrueApiCust->auth('1823',
+            file_get_contents(DIR_PLAY_ROOT.'/pw_cust'),
+            file_get_contents(DIR_PLAY_ROOT.'/apikey_cust'),
+            'Customer'
+        ); // , 'Customer'
+
     }
     
     public function main() {
-        $this->TrueApi->opt(array(
+
+        $x = $this->TrueApiCust->Servers->index();
+
+
+        prd($x);
+
+
+        die();
+
+        $this->TrueApiEmployee->opt(array(
             'returnData' => false,
             'apiFormat' => 'json',
             'buffer' => true,
         ));
 
-        $x = $this->TrueApi->ConfigFiles->view('munin');
+        $x = $this->TrueApiEmployee->ConfigFiles->view('munin');
         prd($x);
 
 //
@@ -64,7 +80,7 @@ class Play {
         die();
 
 
-        $x = $this->TrueApi->Servers->edit(2862, array('relatie_id' => 1378));
+        $x = $this->TrueApiEmployee->Servers->edit(2862, array('relatie_id' => 1378));
         
         #$w = $this->TrueApi->Servers->index();
 
@@ -75,16 +91,16 @@ class Play {
 
         die();
 
-        $this->TrueApi->Servers->apiBuffer(true);
-        $w = $this->TrueApi->Servers->add(array('color' => 'gray', 'os_serial' => 'x'));
-        $y = $this->TrueApi->Servers->edit(2313, array('color' => 'gray', 'os_serial' => 'x'));
-        $z = $this->TrueApi->Servers->apiBuffer('flush');
+        $this->TrueApiEmployee->Servers->apiBuffer(true);
+        $w = $this->TrueApiEmployee->Servers->add(array('color' => 'gray', 'os_serial' => 'x'));
+        $y = $this->TrueApiEmployee->Servers->edit(2313, array('color' => 'gray', 'os_serial' => 'x'));
+        $z = $this->TrueApiEmployee->Servers->apiBuffer('flush');
         pr(compact('w', 'x', 'y', 'z'));
 
 
         die();
 
-        $x = $this->TrueApi->PharosNotifications->store(array(
+        $x = $this->TrueApiEmployee->PharosNotifications->store(array(
             1 => array(
                 'pharos_data_id' => '567101645',
                 'relatie_id' => '1378',
@@ -108,13 +124,13 @@ class Play {
         ));
         prd($x);
 
-        prd($this->TrueApi->rest('put', 'servers/edit/2313', array('color' => 'black')));
+        prd($this->TrueApiEmployee->rest('put', 'servers/edit/2313', array('color' => 'black')));
 
         $feedback = array();
-        if (false !== ($response = $this->TrueApi->Servers->edit(2313, array('color' => 'gray', 'os_serial' => 'x')))) {
+        if (false !== ($response = $this->TrueApiEmployee->Servers->edit(2313, array('color' => 'gray', 'os_serial' => 'x')))) {
             $feedback[] = $response;
         }
-        if (false !== ($response = $this->TrueApi->Servers->view(2313))) {
+        if (false !== ($response = $this->TrueApiEmployee->Servers->view(2313))) {
             $feedback[] = $response;
         }
     //        if (false !== ($response = $this->TrueApi->Servers->monitored())) {
