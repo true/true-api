@@ -28,8 +28,7 @@ class TrueApi extends Base {
     protected $_apiApp        = 'True Api';
     protected $_apiVer        = '0.1';
     protected $_authorization = array();
-    public    $controllers    = array(
-    );
+    public    $controllers    = array();
     protected $_options     = array(
         'service' => 'http://cake.truecare.dev/',
         'format' => 'json',
@@ -37,6 +36,7 @@ class TrueApi extends Base {
         'returnData' => false,
         'fetchControllers' => true,
 
+        'log-date-format' => 'Y-m-d H:i:s',
         'log-file' => '/var/log/true-api.log',
         'log-break-level' => 'crit',
         'app-root' => DIR_TRUEAPI_ROOT,
@@ -50,7 +50,7 @@ class TrueApi extends Base {
      *
      * @return boolean
      */
-    public function buildControllers() {
+    public function buildControllers () {
         $this->ApiControllers = new TrueApiController('api_controllers',
             array($this, 'rest'));
 
@@ -84,7 +84,7 @@ class TrueApi extends Base {
      *
      * @return array
      */
-    public function data($data, $key = null) {
+    public function data ($data, $key = null) {
         if (isset($data['data'])) {
             $data = $data['data'];
         }
@@ -108,7 +108,7 @@ class TrueApi extends Base {
      *
      * @return <type>
      */
-    public function auth($username, $password, $apikey, $class = 'Customer') {
+    public function auth ($username, $password, $apikey, $class = 'Customer') {
         $username = trim($username);
         $password = trim($password);
         $apikey   = trim($apikey);
@@ -130,12 +130,12 @@ class TrueApi extends Base {
         return $this->_authorization;
     }
 
-    protected function _badResponse($dump = '', $reason = 'no reason') {
+    protected function _badResponse ($dump = '', $reason = 'no reason') {
         $this->debug('Received invalid response: %s', $dump);
         return $this->crit('Invalid response from server: %s', $reason);
     }
     
-    public function response($parsed) {
+    public function response ($parsed) {
         if (!is_array(@$parsed['meta']['feedback'])) {
             return $this->_badResponse($parsed, 'No feedback array');
         }
@@ -165,7 +165,7 @@ class TrueApi extends Base {
         return $parsed;
     }
 
-    public function preParse($curlResponse) {
+    public function preParse ($curlResponse) {
         if (empty($curlResponse)) {
             // Should be handled by next step in ->rest()
             return $curlResponse;
@@ -184,7 +184,7 @@ class TrueApi extends Base {
         return $curlResponse->body;
     }
 
-    public function parseJson($curlResponse) {
+    public function parseJson ($curlResponse) {
         if (false === ($body = $this->preParse($curlResponse))) {
             return false;
         }
@@ -198,7 +198,7 @@ class TrueApi extends Base {
         return $response;
     }
 
-    public function parseXml($curlResponse) {
+    public function parseXml ($curlResponse) {
         if (false === ($body = $this->preParse($curlResponse))) {
             return false;
         }
@@ -211,7 +211,7 @@ class TrueApi extends Base {
         return $response;
     }
     
-    public function rest($method, $path, $vars) {
+    public function rest ($method, $path, $vars) {
         // Permanent setup
         if (!$this->RestClient) {
             $restOpts = array(
