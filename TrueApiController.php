@@ -4,7 +4,7 @@ class TrueApiController {
     protected $_callback;
     public    $buffer = false;
     
-    public function __construct($controller, $callback) {
+    public function __construct ($controller, $callback) {
         $this->controller = $controller;
         $this->_callback  = $callback;
     }
@@ -20,7 +20,7 @@ class TrueApiController {
      *
      * @return mixed null or boolean
      */
-    public function apiBuffer($action, $id = null, $vars = null) {
+    public function apiBuffer ($action, $id = null, $vars = null) {
         if ($action === true) {
             $this->buffer = array();
             return null;
@@ -35,8 +35,8 @@ class TrueApiController {
             }
             
             foreach($this->buffer as $bulkaction=>$vars) {
-                if (false === ($res = call_user_func(array($this, $bulkaction),
-                            $vars))) {
+                $res = call_user_func(array($this, $bulkaction), $vars);
+                if (false === ($res)) {
                     return false;
                 }
             }
@@ -71,7 +71,7 @@ class TrueApiController {
      *
      * @param <type> $format
      */
-    public function err($format) {
+    public function err ($format) {
         $args = func_get_args();
         $format  = array_shift($args);
         if (count($args)) {
@@ -91,23 +91,24 @@ class TrueApiController {
      * 
      * @return <type>
      */
-    protected function _rest($method, $action, $vars) {
+    protected function _rest ($method, $action, $vars) {
         $method = str_replace('_', '', $method);
-        return call_user_func_array($this->_callback,
-            array($method, sprintf('%s/%s',
-                    $this->controller, $action), $vars));
+        return call_user_func_array(
+            $this->_callback,
+            array($method, sprintf('%s/%s', $this->controller, $action), $vars)
+        );
     }
 
-    protected function _get($action, $vars = array()) {
+    protected function _get ($action, $vars = array()) {
         return $this->_rest(__FUNCTION__, $action, $vars);
     }
-    protected function _put($action, $vars) {
+    protected function _put ($action, $vars) {
         return $this->_rest(__FUNCTION__, $action, $vars);
     }
-    protected function _post($action, $vars) {
+    protected function _post ($action, $vars) {
         return $this->_rest(__FUNCTION__, $action, $vars);
     }
-    protected function _delete($action, $vars) {
+    protected function _delete ($action, $vars) {
         return $this->_rest(__FUNCTION__, $action, $vars);
     }
 
@@ -119,7 +120,7 @@ class TrueApiController {
      * 
      * @return <type>
      */
-    public function  __call($name, $arguments) {
+    public function  __call ($name, $arguments) {
         if (count($arguments) === 0) {
             // Index methods
             return $this->_get($name);
@@ -142,8 +143,10 @@ class TrueApiController {
      */
     public function index($scope = null, $vars = array()) {
         // View methods
-        return $this->_get(sprintf('%s%s', __FUNCTION__,
-                is_string($scope) ? '/scope:' . $scope : ''), $vars);
+        return $this->_get(
+            sprintf('%s%s', __FUNCTION__, is_string($scope) ? '/scope:' . $scope : ''),
+            $vars
+        );
     }
 
     /**
@@ -153,7 +156,7 @@ class TrueApiController {
      *
      * @return <type>
      */
-    public function add($vars = array()) {
+    public function add ($vars = array()) {
         if ($this->apiBuffer(__FUNCTION__, 0, $vars)) {
             return null;
         }
@@ -168,17 +171,20 @@ class TrueApiController {
      *
      * @return <type>
      */
-    public function edit($id, $vars = array()) {
+    public function edit ($id, $vars = array()) {
         if ($this->apiBuffer(__FUNCTION__, $id, $vars)) {
             return null;
         }
 
         return $this->_put(sprintf('%s/%s', __FUNCTION__, $id), $vars);
     }
-    public function store($vars = array()) {
+    public function store ($vars = array()) {
         return $this->_put(__FUNCTION__, $vars);
     }
-    public function delete($id, $vars = array()) {
+    public function snapshot ($vars = array()) {
+        return $this->_put(__FUNCTION__, $vars);
+    }
+    public function delete ($id, $vars = array()) {
         #return $this->_delete(__FUNCTION__.'/'.$id, $vars);
     }
 }
