@@ -49,6 +49,7 @@ class Play {
             $this->TrueApi = new TrueApi(array(
                 'log-print-level' => 'debug',
                 'verifySSL' => false,
+                'format' => 'xml',
                 'service' => 'http://cake.truecare.dev/',
             ));
             $this->TrueApi->auth('1823',

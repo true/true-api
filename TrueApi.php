@@ -136,22 +136,21 @@ class TrueApi extends Base {
     }
     
     public function response ($parsed) {
-        if (!is_array(@$parsed['meta']['feedback'])) {
-            return $this->_badResponse($parsed, 'No feedback array');
-        }
         if (!is_array(@$parsed['data'])) {
             return $this->_badResponse($parsed, 'No data');
         }
-        
-        $fail = false;
-        foreach ($parsed['meta']['feedback'] as $feedback) {
-            $this->log($feedback['level'], 'server-side: %s', $feedback['message']);
-            if ($feedback['level'] === 'error') {
-                $fail = true;
+
+        if (is_array(@$parsed['meta']['feedback'])) {
+            $fail = false;
+            foreach ($parsed['meta']['feedback'] as $feedback) {
+                $this->log($feedback['level'], 'server-side: %s', $feedback['message']);
+                if ($feedback['level'] === 'error') {
+                    $fail = true;
+                }
             }
-        }
-        if ($fail) {
-            return $this->crit('Can\'t continue after this');
+            if ($fail) {
+                return $this->crit('Can\'t continue after this');
+            }
         }
 
         if ($parsed['meta']['status'] === 'error') {
@@ -172,13 +171,21 @@ class TrueApi extends Base {
         }
 
         if (!isset($curlResponse->body)) {
-            return $this->_badResponse($curlResponse,
-                'No body in curl response');
+            return $this->_badResponse(
+                $curlResponse,
+                'No body in curl response'
+            );
         }
 
         if ($curlResponse->body === '') {
-            return $this->_badResponse($curlResponse,
-                'Empty body in curl response');
+            if ($this->RestClient->error) {
+                return $this->crit($this->RestClient->error);
+            }
+
+            return $this->_badResponse(
+                $curlResponse,
+                'Empty body in curl response'
+            );
         }
 
         return $curlResponse->body;
@@ -202,9 +209,9 @@ class TrueApi extends Base {
         if (false === ($body = $this->preParse($curlResponse))) {
             return false;
         }
-        
-        // @todo: A working Unserialize XML:
-        if (false === ($response = $this->Xml->parse($curlResponse->body))) {
+
+        $response = $this->Xml->decode($curlResponse->body);
+        if (false === ($response)) {
             return $this->_badResponse($curlResponse, 'XML parse error');
         }
         
@@ -221,10 +228,16 @@ class TrueApi extends Base {
                     $this->_apiApp, $this->_apiVer),
             );
             $this->RestClient = new RestClient(false, false, $restOpts);
-            $this->RestClient->add_response_type('json',
-                array($this, 'parseJson'), '.json');
-            $this->RestClient->add_response_type('xml',
-                array($this, 'parseXml'), '.xml');
+            $this->RestClient->add_response_type(
+                'json',
+                array($this, 'parseJson'), 
+                '.json'
+            );
+            $this->RestClient->add_response_type(
+                'xml',
+                array($this, 'parseXml'), 
+                '.xml'
+            );
         }
 
         // Validate
@@ -236,9 +249,6 @@ class TrueApi extends Base {
         }
 
         // Dynamic options
-        if (strtolower($this->opt('format')) === 'xml') {
-            return $this->err('XML Not yet supported');
-        }
         $this->RestClient->headers('Authorization', $this->_authorization);
         $this->RestClient->set_response_type($this->opt('format'));
         $this->RestClient->request_prefix = $this->opt('service');
@@ -252,8 +262,11 @@ class TrueApi extends Base {
         $this->debug('requesting path: %s', $path);
 
         // Make the call
-        $parsed = call_user_func(array($this->RestClient, $method),
-            $path, $vars);
+        $parsed = call_user_func(
+            array($this->RestClient, $method),
+            $path, 
+            $vars
+        );
 
         if ($parsed) {
             $response = $this->response($parsed);
