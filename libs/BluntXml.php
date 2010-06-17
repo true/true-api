@@ -30,7 +30,7 @@ class BluntXml {
 			return false;
 		}
 
-		$array	  = $this->_toArray($obj);
+		$array	    = $this->_toArray($obj);
 		$unitemized = $this->_unitemize($array);
 
 		return $unitemized;
@@ -124,7 +124,7 @@ class BluntXml {
 		if (!$doc->loadXML($xml)) {
 			trigger_error('Invalid XML: ' . $xml, E_USER_ERROR);
 		}
-		$doc->encoding = $this->encoding;
+		$doc->encoding     = $this->encoding;
 		$doc->formatOutput = true;
 
 		return $doc->saveXML();
@@ -164,7 +164,7 @@ class BluntXml {
 				} else {
 					$this->_toXml($val);
 				}
-			} elseif(is_string($val)) {
+			} elseif (is_string($val)) {
 				$this->_encodeBuffer .= $val;
 			}
 			// Draw closing tag
