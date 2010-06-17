@@ -10,101 +10,101 @@
  * @version 0.1
  */
 class BluntXml {
-    public $itemTag  = 'item';
-    public $rootTag  = 'root';
-    public $encoding = 'utf-8';
-    public $version  = '1.0';
-    public $beautify = true;
+	public $itemTag  = 'item';
+	public $rootTag  = 'root';
+	public $encoding = 'utf-8';
+	public $version  = '1.0';
+	public $beautify = true;
 
-    protected $_encodeBuffer = '';
+	protected $_encodeBuffer = '';
 
-    /**
-     * Decode xml string to multidimensional array
-     *
-     * @param string $xml
-     *
-     * @return array
-     */
-    public function decode ($xml) {
-        if (!($obj = simplexml_load_string($xml))) {
-            return false;
-        }
+	/**
+	 * Decode xml string to multidimensional array
+	 *
+	 * @param string $xml
+	 *
+	 * @return array
+	 */
+	public function decode ($xml) {
+		if (!($obj = simplexml_load_string($xml))) {
+			return false;
+		}
 
-        $array      = $this->_toArray($obj);
-        $unitemized = $this->_unitemize($array);
+		$array	  = $this->_toArray($obj);
+		$unitemized = $this->_unitemize($array);
 
-        return $unitemized;
-    }
+		return $unitemized;
+	}
 
-    /**
-     * Encode multidimensional array to xml string
-     *
-     * @param array $array
-     *
-     * @return string
-     */
+	/**
+	 * Encode multidimensional array to xml string
+	 *
+	 * @param array $array
+	 *
+	 * @return string
+	 */
 	public function encode ($array, $rootTag = null) {
-        if ($rootTag !== null) {
-            $this->rootTag = $rootTag;
-        }
+		if ($rootTag !== null) {
+			$this->rootTag = $rootTag;
+		}
 
-        $this->_encodeBuffer = '';
+		$this->_encodeBuffer = '';
 		$this->_toXml(array($this->rootTag => $array));
 
 		return $this->_xmlBeautify($this->_encodeBuffer);
 	}
 
-    /**
-     * Strips out <item> tags and nests children in sensible places
-     *
-     * @param array $array
-     *
-     * @return array
-     */
-    protected function _unitemize ($array) {
-        if (!is_array($array)) {
-            return $array;
-        }
-        foreach ($array as $key => $val) {
-            if (is_array($val)) {
-                $array[$key] = $this->_unitemize($val);
-            }
+	/**
+	 * Strips out <item> tags and nests children in sensible places
+	 *
+	 * @param array $array
+	 *
+	 * @return array
+	 */
+	protected function _unitemize ($array) {
+		if (!is_array($array)) {
+			return $array;
+		}
+		foreach ($array as $key => $val) {
+			if (is_array($val)) {
+				$array[$key] = $this->_unitemize($val);
+			}
 
-            if ($key === $this->itemTag && is_array($val)) {
-                if ($this->_numeric($val)) {
-                    foreach ($val as $i => $v) {
-                        $array[] = $v;
-                    }
-                } else {
-                    $array[] = $val;
-                }
-                unset($array[$this->itemTag]);
-            }
-        }
-        return $array;
-    }
+			if ($key === $this->itemTag && is_array($val)) {
+				if ($this->_numeric($val)) {
+					foreach ($val as $i => $v) {
+						$array[] = $v;
+					}
+				} else {
+					$array[] = $val;
+				}
+				unset($array[$this->itemTag]);
+			}
+		}
+		return $array;
+	}
 
-    /**
-     * SimpleXML Object to Array
-     *
-     * @param object $object
-     * @param array  $array
-     */
-    protected function _toArray ($object) {
-       $array = array();
-       foreach ((array) $object as $key => $var) {
-           if (is_object($var)) {
-               if (count((array) $var) == 0) {
-                   $array[$key] = null;
-               } else {
-                   $array[$key] = $this->_toArray($var);
-               }
-           } else {
-               $array[$key] = $var;
-           }
-       }
-       return $array;
-    }
+	/**
+	 * SimpleXML Object to Array
+	 *
+	 * @param object $object
+	 * @param array  $array
+	 */
+	protected function _toArray ($object) {
+	   $array = array();
+	   foreach ((array) $object as $key => $var) {
+		   if (is_object($var)) {
+			   if (count((array) $var) == 0) {
+				   $array[$key] = null;
+			   } else {
+				   $array[$key] = $this->_toArray($var);
+			   }
+		   } else {
+			   $array[$key] = $var;
+		   }
+	   }
+	   return $array;
+	}
 
 	/**
 	 * Takes unformatted xml string and beautifies it
