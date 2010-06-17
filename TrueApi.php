@@ -22,19 +22,32 @@ require_once DIR_TRUEAPI_ROOT.'/TrueApiController.php';
 require_once DIR_TRUEAPI_ROOT.'/libs/BluntXml.php';
 require_once DIR_RESTCLIENT_ROOT.'/RestClient.php';
 
+/**
+ * Generic interface to True's API
+ *
+ * @link http://www.truecare.nl
+ * @link http://github.com/true/true-api
+ *
+ * @author kvz
+ */
 class TrueApi extends Base {
     public    $BluntXml;
     public    $RestClient     = false;
-    protected $_apiApp        = 'True Api';
-    protected $_apiVer        = '0.1';
-    protected $_authorization = array();
     public    $controllers    = array();
+
+    protected $_apiApp        = 'True Api';
+    protected $_apiVer        = '0.2';
+    protected $_apiUrl        = 'http://github.com/true/true-api/raw/master/TrueApi.php';
+
+    protected $_authorization = array();
+
     protected $_options     = array(
         'service' => 'http://cake.truecare.dev/',
         'format' => 'json',
         'verifySSL' => true,
         'returnData' => false,
         'fetchControllers' => true,
+        'checkVersion' => true,
 
         'log-date-format' => 'Y-m-d H:i:s',
         'log-file' => '/var/log/true-api.log',
@@ -51,25 +64,60 @@ class TrueApi extends Base {
      * @return boolean
      */
     public function buildControllers () {
-        $this->ApiControllers = new TrueApiController('api_controllers',
-            array($this, 'rest'));
+        $this->ApiControllers = new TrueApiController(
+            'api_controllers',
+            array('index' => array()),
+            array($this, 'rest')
+        );
 
         $this->debug('Retrieving possible controllers');
-        $this->controllers = $this->data($this->ApiControllers->index(),
-            'controllers');
+        $response = $this->ApiControllers->index();
+        
+        if ($this->opt('checkVersion')) {
+            $remoteVersion = $this->data(
+                $response,
+                'version',
+                'meta'    
+            );
+            
+            $compare = version_compare($this->_apiVer, $remoteVersion);
+            if ($compare != 0) {
+                $this->warning(
+                    'Your version %s is %s than the server\'s %s',
+                    $this->_apiVer,
+                    $compare < 0 ? 'lower' : 'higher',
+                    $remoteVersion
+                );
+            }
+        }
 
+
+        $this->controllers = $this->data(
+            $response,
+            'controllers'
+        );
+        
         if (!$this->controllers) {
             return $this->err('Unable to fetch controllers');
         }
 
-        foreach ($this->controllers as $controller) {
+        foreach ($this->controllers as $controller => $actions) {
+            if (is_numeric($controller) || !is_array($actions)) {
+                return $this->crit(
+                    'Invalid controller formatting. Please upgrade your API client'
+                );
+            }
+            
             $underscore = $this->underscore($controller);
-            $class = $this->camelize($underscore);
+            $class      = $this->camelize($underscore);
             if (isset($this->{$class}) && is_object($this->{$class})) {
                 continue;
             }
-            $this->{$class} = new TrueApiController($underscore,
-                array($this, 'rest'));
+            $this->{$class} = new TrueApiController(
+                $underscore,
+                $actions,
+                array($this, 'rest')
+            );
         }
         
         return true;
@@ -84,9 +132,9 @@ class TrueApi extends Base {
      *
      * @return array
      */
-    public function data ($data, $key = null) {
-        if (isset($data['data'])) {
-            $data = $data['data'];
+    public function data ($data, $key = null, $parent = 'data') {
+        if (isset($data[$parent])) {
+            $data = $data[$parent];
         }
 
         if ($key !== null) {
@@ -178,8 +226,8 @@ class TrueApi extends Base {
         }
 
         if ($curlResponse->body === '') {
-            if ($this->RestClient->error) {
-                return $this->crit($this->RestClient->error);
+            if ($this->RestClient()->error) {
+                return $this->crit($this->RestClient()->error);
             }
 
             return $this->_badResponse(
@@ -197,8 +245,10 @@ class TrueApi extends Base {
         }
 
         if (!is_array(($response = json_decode($curlResponse->body, true)))) {
-            return $this->_badResponse($curlResponse->body,
-                'json parse error');
+            return $this->_badResponse(
+                $curlResponse->body,
+                'json parse error'
+            );
 
         }
 
@@ -217,31 +267,37 @@ class TrueApi extends Base {
         
         return $response;
     }
-    
-    public function rest ($method, $path, $vars) {
+
+    public function RestClient() {
         // Permanent setup
         if (!$this->RestClient) {
             $restOpts = array(
                 'verifySSL' => $this->opt('verifySSL'),
                 'cookieFile' => false,
-                'userAgent' => sprintf('%s v%s',
-                    $this->_apiApp, $this->_apiVer),
+                'userAgent' => sprintf(
+                    '%s v%s',
+                    $this->_apiApp, 
+                    $this->_apiVer
+                ),
             );
             $this->RestClient = new RestClient(false, false, $restOpts);
             $this->RestClient->add_response_type(
                 'json',
-                array($this, 'parseJson'), 
+                array($this, 'parseJson'),
                 '.json'
             );
             $this->RestClient->add_response_type(
                 'xml',
-                array($this, 'parseXml'), 
+                array($this, 'parseXml'),
                 '.xml'
             );
         }
+        return $this->RestClient;
+    }
 
+    public function rest ($method, $path, $vars) {
         // Validate
-        if (!method_exists($this->RestClient, $method)) {
+        if (!method_exists($this->RestClient(), $method)) {
             return $this->err('Rest method "%s" does not exist.', $method);
         }
         if (empty($this->_authorization)) {
@@ -249,10 +305,10 @@ class TrueApi extends Base {
         }
 
         // Dynamic options
-        $this->RestClient->headers('Authorization', $this->_authorization);
-        $this->RestClient->set_response_type($this->opt('format'));
-        $this->RestClient->request_prefix = $this->opt('service');
-        $this->RestClient->request_suffix = '.'.$this->opt('format');
+        $this->RestClient()->headers('Authorization', $this->_authorization);
+        $this->RestClient()->set_response_type($this->opt('format'));
+        $this->RestClient()->request_prefix = $this->opt('service');
+        $this->RestClient()->request_suffix = '.'.$this->opt('format');
 
         // Wrap any data in the data var
         if (!empty($vars)) {
@@ -263,7 +319,7 @@ class TrueApi extends Base {
 
         // Make the call
         $parsed = call_user_func(
-            array($this->RestClient, $method),
+            array($this->RestClient(), $method),
             $path, 
             $vars
         );
@@ -272,14 +328,14 @@ class TrueApi extends Base {
             $response = $this->response($parsed);
         }
 
-        if (!$parsed && $this->RestClient->error) {
-            return $this->crit($this->RestClient->error);
+        if (!$parsed && $this->RestClient()->error) {
+            return $this->crit($this->RestClient()->error);
         }
         if (!$parsed) {
             return $this->err('a parse error occured');
         }
-        if ($this->RestClient->error) {
-            return $this->crit($this->RestClient->error);
+        if ($this->RestClient()->error) {
+            return $this->crit($this->RestClient()->error);
         }
 
         return $response;

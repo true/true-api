@@ -1,11 +1,13 @@
 <?php
 class TrueApiController {
-    public    $controller;
     protected $_callback;
-    public    $buffer = false;
+
+    public $controller;
+    public $buffer = false;
     
-    public function __construct ($controller, $callback) {
+    public function __construct ($controller, $actions, $callback) {
         $this->controller = $controller;
+        $this->actions    = $actions;
         $this->_callback  = $callback;
     }
 
@@ -30,11 +32,13 @@ class TrueApiController {
                 return $this->err('Buffer is empty');
             }
             if (count($this->buffer) > 1) {
-                return $this->err('Buffer can only contain 1 kind of '.
-                    ' bulk action. e.g. Don\'t mix deletes with edits.');
+                return $this->err(
+                    'Buffer can only contain 1 kind of '.
+                    ' bulk action. e.g. Don\'t mix deletes with edits.'
+                );
             }
             
-            foreach($this->buffer as $bulkaction=>$vars) {
+            foreach ($this->buffer as $bulkaction => $vars) {
                 $res = call_user_func(array($this, $bulkaction), $vars);
                 if (false === ($res)) {
                     return false;
@@ -77,8 +81,7 @@ class TrueApiController {
         if (count($args)) {
             $format = vsprintf($format, (array)$args);
         }
-        trigger_error($format,
-            E_USER_ERROR);
+        trigger_error($format, E_USER_ERROR);
         return false;
     }
 
@@ -93,9 +96,11 @@ class TrueApiController {
      */
     protected function _rest ($method, $action, $vars) {
         $method = str_replace('_', '', $method);
-        return call_user_func_array(
+        return call_user_func(
             $this->_callback,
-            array($method, sprintf('%s/%s', $this->controller, $action), $vars)
+            $method,
+            sprintf('%s/%s', $this->controller, $action),
+            $vars
         );
     }
 
@@ -115,18 +120,18 @@ class TrueApiController {
     /**
      * Read functions. Can't buffer them.
      *
-     * @param <type> $name
-     * @param <type> $arguments
+     * @param <type> $action
+     * @param <type> $vars
      * 
      * @return <type>
      */
-    public function  __call ($name, $arguments) {
-        if (count($arguments) === 0) {
+    public function  __call ($action, $vars) {
+        if (count($vars) === 0) {
             // Index methods
-            return $this->_get($name);
-        } elseif (count($arguments) === 1) {
+            return $this->_get($action);
+        } elseif (count($vars) === 1) {
             // View methods
-            return $this->_get(sprintf('%s/%s', $name, $arguments[0]));
+            return $this->_get(sprintf('%s/%s', $action, $vars[0]));
         }
 
         return false;
@@ -141,12 +146,12 @@ class TrueApiController {
      * 
      * @return <type>
      */
-    public function index($scope = null, $vars = array()) {
-        // View methods
-        return $this->_get(
+    public function index ($scope = null, $vars = array()) {
+        $data = $this->_get(
             sprintf('%s%s', __FUNCTION__, is_string($scope) ? '/scope:' . $scope : ''),
             $vars
         );
+        return $data;
     }
 
     /**
