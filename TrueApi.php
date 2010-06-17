@@ -19,11 +19,11 @@ if (!defined('DIR_EGGSHELL_ROOT')) {
 
 require_once DIR_EGGSHELL_ROOT.'/Base.php';
 require_once DIR_TRUEAPI_ROOT.'/TrueApiController.php';
-require_once DIR_TRUEAPI_ROOT.'/Xml.php';
+require_once DIR_TRUEAPI_ROOT.'/libs/BluntXml.php';
 require_once DIR_RESTCLIENT_ROOT.'/RestClient.php';
 
 class TrueApi extends Base {
-    public    $Xml;
+    public    $BluntXml;
     public    $RestClient     = false;
     protected $_apiApp        = 'True Api';
     protected $_apiVer        = '0.1';
@@ -210,7 +210,7 @@ class TrueApi extends Base {
             return false;
         }
 
-        $response = $this->Xml->decode($curlResponse->body);
+        $response = $this->BluntXml->decode($curlResponse->body);
         if (false === ($response)) {
             return $this->_badResponse($curlResponse, 'XML parse error');
         }
