@@ -34,7 +34,7 @@ class TrueApiController {
             if (count($this->buffer) > 1) {
                 return $this->err(
                     'Buffer can only contain 1 kind of '.
-                    ' bulk action. e.g. Don\'t mix deletes with edits.'
+                    'bulk action. e.g. Don\'t mix deletes with edits.'
                 );
             }
             
@@ -126,26 +126,38 @@ class TrueApiController {
      * @return <type>
      */
     public function  __call ($action, $vars) {
-        if (count($vars) === 0) {
-            // Index methods
-            return $this->_get($action);
-        } elseif (count($vars) === 1) {
-            // View methods
-            return $this->_get(sprintf('%s/%s', $action, $vars[0]));
+        if (!isset($this->actions[$action])) {
+            return $this->err(
+                'Action %s not implemented for REST on controller %s',
+                 $action,
+                 $this->controller
+            );
         }
 
-        return false;
+        if (!isset($this->actions[$action]['method'])) {
+            return $this->err(
+                'Server did not specify what "method" is supposed to used for action %s',
+                 $action
+            );
+        }
+        if (!isset($this->actions[$action]['id'])) {
+            return $this->err(
+                'Server did not specify if "id" is supposed to used for action %s',
+                 $action
+            );
+        }
+
+        $method = $this->actions[$action]['method'];
+
+        if (!isset($this->actions[$action]['id'])) {
+            $id = array_shift($vars);
+            $action = sprintf('%s/%s', $action, $id);
+        }
+
+        return $this->_rest($method, $action, $vars);
     }
 
 
-
-    /**
-     * Index. Can't buffer it.
-     *
-     * @param <type> $vars
-     * 
-     * @return <type>
-     */
     public function index ($scope = null, $vars = array()) {
         $data = $this->_get(
             sprintf('%s%s', __FUNCTION__, is_string($scope) ? '/scope:' . $scope : ''),
@@ -154,13 +166,6 @@ class TrueApiController {
         return $data;
     }
 
-    /**
-     * Add. Buffering allowed.
-     *
-     * @param <type> $vars
-     *
-     * @return <type>
-     */
     public function add ($vars = array()) {
         if ($this->apiBuffer(__FUNCTION__, 0, $vars)) {
             return null;
@@ -168,28 +173,12 @@ class TrueApiController {
 
         return $this->_put(sprintf('%s', __FUNCTION__), $vars);
     }
-    /**
-     * Edit. Buffering allowed.
-     *
-     * @param <type> $id
-     * @param <type> $vars
-     *
-     * @return <type>
-     */
+
     public function edit ($id, $vars = array()) {
         if ($this->apiBuffer(__FUNCTION__, $id, $vars)) {
             return null;
         }
 
         return $this->_put(sprintf('%s/%s', __FUNCTION__, $id), $vars);
-    }
-    public function store ($vars = array()) {
-        return $this->_put(__FUNCTION__, $vars);
-    }
-    public function snapshot ($vars = array()) {
-        return $this->_put(__FUNCTION__, $vars);
-    }
-    public function delete ($id, $vars = array()) {
-        #return $this->_delete(__FUNCTION__.'/'.$id, $vars);
     }
 }

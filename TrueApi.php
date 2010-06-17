@@ -96,7 +96,7 @@ class TrueApi extends Base {
             $response,
             'controllers'
         );
-        
+
         if (!$this->controllers) {
             return $this->err('Unable to fetch controllers');
         }

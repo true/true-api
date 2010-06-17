@@ -92,15 +92,15 @@ class BluntXml {
 	 */
 	protected function _toArray ($object) {
 	   $array = array();
-	   foreach ((array) $object as $key => $var) {
-		   if (is_object($var)) {
-			   if (count((array) $var) == 0) {
+	   foreach ((array) $object as $key => $val) {
+		   if (is_object($val)) {
+			   if (count((array) $val) == 0) {
 				   $array[$key] = null;
 			   } else {
-				   $array[$key] = $this->_toArray($var);
+				   $array[$key] = $this->_toArray($val);
 			   }
 		   } else {
-			   $array[$key] = $var;
+			   $array[$key] = $this->_fromXmlValue($val);
 		   }
 	   }
 	   return $array;
@@ -139,7 +139,7 @@ class BluntXml {
 	 */
 	protected function _toXml ($array) {
 		if (!is_array($array)) {
-			$this->_encodeBuffer .= $array;
+			$this->_encodeBuffer .= $this->_toXmlValue($array);
 			return;
 		}
 
@@ -164,14 +164,40 @@ class BluntXml {
 				} else {
 					$this->_toXml($val);
 				}
-			} elseif (is_string($val)) {
-				$this->_encodeBuffer .= $val;
+			} else {
+				$this->_encodeBuffer .= $this->_toXmlValue($val);
 			}
 			// Draw closing tag
 			if (!is_numeric($key)) {
 				$this->_encodeBuffer .= sprintf("</%s>", $key);
 			}
 		}
+	}
+
+	protected function _toXmlValue ($data) {
+		if ($data === true) {
+			return 'TRUE';
+		}
+		if ($data === false) {
+			return 'FALSE';
+		}
+		if ($data === null) {
+			return 'NULL';
+		}
+		return $data;
+	}
+
+	protected function _fromXmlValue ($data) {
+		if ($data === 'TRUE') {
+			return true;
+		}
+		if ($data === 'FALSE') {
+			return false;
+		}
+		if ($data === 'NULL') {
+			return null;
+		}
+		return $data;
 	}
 
 	/**
