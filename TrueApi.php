@@ -41,7 +41,7 @@ class TrueApi extends Base {
 
     protected $_authorization = array();
 
-    protected $_options     = array(
+    protected $_options = array(
         'service' => 'http://cake.truecare.dev/',
         'format' => 'json',
         'verifySSL' => true,
@@ -56,6 +56,24 @@ class TrueApi extends Base {
         'class-autobind' => true,
         'class-autosetup' => true,
     );
+
+    public function __get ($name) {
+        if (!isset($this->controllers[$name])) {
+            if (empty($this->controllers)) {
+                $this->crit(
+                    'Controller: %s not loaded. Looks like you need to call ' .
+                    '->auth() first which will automatically call buildControllers.',
+                    $name
+                );
+            } else {
+                $this->crit(
+                    'Controller: %s not loaded. It either doesn\'t exist or ' .
+                    'you don\'t have access.',
+                    $name
+                );
+            }
+        }
+    }
 
     /**
      * Loads a remote list of controllers and sets them up as

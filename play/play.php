@@ -63,6 +63,31 @@ class Play {
     
     public function main() {
 
+        $x = $this->TrueApi->PharosNotifications->store(array(
+            1 => array(
+                'pharos_data_id' => '567101645',
+                'relatie_id' => '1378',
+                'server_id' => '3736',
+                'port' => 'ssh',
+                'status' => 'down',
+                'sent' => '6',
+                'mstamp' => '2009-11-20 13:31:14',
+                'stamp' => '2009-11-20 13:31:20',
+            ),
+            2 => array(
+                'pharos_data_id' => '567101645',
+                'relatie_id' => '1378',
+                'server_id' => '3736',
+                'port' => 'ssh',
+                'status' => 'down',
+                'sent' => '6',
+                'mstamp' => '2009-11-20 13:31:14',
+                'stamp' => '2009-11-20 13:31:20',
+            ),
+        ));
+        prd($x);
+
+        die();
         $servers = $this->TrueApi->Servers->index();
         print_r($servers);
 
