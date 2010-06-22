@@ -149,12 +149,12 @@ class TrueApiController {
 
         $method = $this->actions[$action]['method'];
 
-        if (!isset($this->actions[$action]['id'])) {
+        if ($this->actions[$action]['id']) {
             $id = array_shift($vars);
             $action = sprintf('%s/%s', $action, $id);
         }
 
-        return $this->_rest($method, $action, $vars);
+        return $this->_rest($method, $action, array_shift($vars));
     }
 
 
