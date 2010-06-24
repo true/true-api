@@ -313,7 +313,7 @@ class TrueApi extends Base {
         return $this->RestClient;
     }
 
-    public function rest ($method, $path, $vars) {
+    public function rest ($method, $path, $vars = array()) {
         // Validate
         if (!method_exists($this->RestClient(), $method)) {
             return $this->err('Rest method "%s" does not exist.', $method);
