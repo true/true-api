@@ -157,7 +157,6 @@ class TrueApiController {
         return $this->_rest($method, $action, array_shift($vars));
     }
 
-
     public function index ($scope = null, $vars = array()) {
         $data = $this->_get(
             sprintf('%s%s', __FUNCTION__, is_string($scope) ? '/scope:' . $scope : ''),

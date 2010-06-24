@@ -33,7 +33,7 @@ if (!function_exists('d')) {
 class Play {
 
     public function  __construct() {
-        if (false) {
+        if (true) {
             $this->TrueApi = new TrueApi(array(
                 'log-print-level' => 'debug',
                 'verifySSL' => false,
@@ -62,6 +62,17 @@ class Play {
     }
     
     public function main() {
+        $x = $this->TrueApi->rest('get', 'servers/index');
+
+        prd(compact('x'));
+
+        die();
+        $x = $this->TrueApi->MonitoringServices->snapshot();
+
+        prd(compact('x'));
+
+        die();
+
 
         $x = $this->TrueApi->PharosNotifications->store(array(
             1 => array(
