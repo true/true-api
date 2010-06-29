@@ -20,17 +20,51 @@ Let's look at an example how to include & use the Client
     // Include
     require_once '/var/git/true-api/TrueApi.php';
 
+    // Instantiate
+    // (more configurable options below)
+    $TrueApi = new TrueApi(array(
+        'log-file' => '/var/log/true-api.log',
+    ));
+
     // In real life: get credentials from some place safe,
     // but for the sake of example let's store them here:
     $account  = '1231';
     $password = 'Pjsadrfj*1';
     $apikey   = 'e89e1e521d0cedc6b96232fd2741addfbe6e69ddf235cedad140b986c200ead8';
 
-    // Checks credentials & Initializes all available API objects
+    // Store credentials & Initialize all available API controllers
     $TrueApi->auth($account, $password, $apikey);
 
-    // Now we can call API objects directly such as Servers:
+    // Now we can address API controllers directly as client objects, e.g. Servers:
+    // Return all servers
     $servers = $TrueApi->Servers->index();
     print_r($servers);
-    ?>
+    
+    // Edit server with id: 1337
+    $success = $TrueApi->Servers->edit(1337, array(
+        'hostname' => 'updated-hostname.example.com',
+    ));
 
+    // Add server with hostname: www.example.com
+    $success = $TrueApi->Servers->add(array(
+        'hostname' => 'www.example.com',
+    ));
+?>
+
+## More Configurable options
+
+    <?php
+    // Other configurable options:
+    $_options = array(
+        'service' => 'http://api.true.nl/',
+        'format' => 'json',
+        'verifySSL' => true,
+        'returnData' => false,
+        'fetchControllers' => true,
+        'checkVersion' => true,
+
+        'log-date-format' => 'Y-m-d H:i:s',
+        'log-file' => '/var/log/true-api.log',
+        'log-break-level' => 'crit',
+    );
+    ?>
