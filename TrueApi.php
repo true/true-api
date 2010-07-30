@@ -280,7 +280,7 @@ class TrueApi extends Base {
 
         $response = $this->BluntXml->decode($curlResponse->body);
         if (false === ($response)) {
-            return $this->_badResponse($curlResponse, 'XML parse error');
+            return $this->_badResponse($curlResponse->body, 'XML parse error');
         }
         
         return $response;
