@@ -61,15 +61,23 @@ class Play {
     }
 
     public function dns () {
-        $records = $this->TrueApi->DnsRecords->index();
+        $records = $this->TrueApi->DnsRecords->index('ladolcevilla.nl');
+//        $this->TrueApi->DnsRecords->edit(12873834, array(
+//            'content' => 'www.google.com',
+//        ));
+        
         prd($records);
+    }
+
+    public function servers () {
+        $servers = $this->TrueApi->Servers->index();
+        print_r($servers);
     }
 
     public function main() {
         return $this->dns();
+        #return $this->servers();
         
-        $servers = $this->TrueApi->Servers->index();
-        print_r($servers);
         die();
 
         $x = $this->TrueApi->rest('get', 'servers/index');

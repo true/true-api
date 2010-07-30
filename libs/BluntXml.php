@@ -7,13 +7,12 @@
  *
  * @author kvz
  * @author Jonathan Dalrymple
- * @version 0.1
  */
 class BluntXml {
 	public $itemTag  = 'item';
 	public $rootTag  = 'root';
 	public $encoding = 'utf-8';
-	public $version  = '1.0';
+	public $version  = '1.1';
 	public $beautify = true;
 
 	protected $_encodeBuffer = '';
@@ -88,19 +87,22 @@ class BluntXml {
 	 * SimpleXML Object to Array
 	 *
 	 * @param object $object
-	 * @param array  $array
+     *
+	 * @return array $array
 	 */
 	protected function _toArray ($object) {
 	   $array = array();
 	   foreach ((array) $object as $key => $val) {
 		   if (is_object($val)) {
-			   if (count((array) $val) == 0) {
+			   if (count($val->children()) == 0) {
 				   $array[$key] = null;
 			   } else {
 				   $array[$key] = $this->_toArray($val);
 			   }
+           } else if (is_array($val)) {
+               $array[$key] = $this->_toArray($val);
 		   } else {
-			   $array[$key] = $this->_fromXmlValue($val);
+			   $array[$key] = $this->_toArrayValue($val, $key);
 		   }
 	   }
 	   return $array;
@@ -187,7 +189,7 @@ class BluntXml {
 		return $data;
 	}
 
-	protected function _fromXmlValue ($data) {
+	protected function _toArrayValue ($data, $key = '') {
 		if ($data === 'TRUE') {
 			return true;
 		}
