@@ -202,10 +202,6 @@ class TrueApi extends Base {
     }
     
     public function response ($parsed) {
-        if (!is_array(@$parsed['data'])) {
-            return $this->_badResponse($parsed, 'No data');
-        }
-
         if (is_array(@$parsed['meta']['feedback'])) {
             $fail = false;
             foreach ($parsed['meta']['feedback'] as $feedback) {
@@ -221,6 +217,10 @@ class TrueApi extends Base {
 
         if ($parsed['meta']['status'] === 'error') {
             return false;
+        }
+
+        if (!is_array(@$parsed['data'])) {
+            return $this->_badResponse($parsed, 'No data');
         }
 
         if ($this->opt('returnData')) {
@@ -342,6 +342,7 @@ class TrueApi extends Base {
             $vars
         );
 
+
         if ($parsed) {
             $response = $this->response($parsed);
         }
@@ -355,7 +356,7 @@ class TrueApi extends Base {
         if ($this->RestClient()->error) {
             return $this->crit($this->RestClient()->error);
         }
-
+        
         return $response;
     }
 }

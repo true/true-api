@@ -33,7 +33,7 @@ if (!function_exists('d')) {
 class Play {
 
     public function  __construct() {
-        if (true) {
+        if (false) {
             $this->TrueApi = new TrueApi(array(
                 'log-print-level' => 'debug',
                 'verifySSL' => false,
@@ -45,7 +45,6 @@ class Play {
                 'Employee'
             ); // , 'Employee'
         } else {
-            
             $this->TrueApi = new TrueApi(array(
                 'log-print-level' => 'debug',
                 'verifySSL' => false,
@@ -60,8 +59,19 @@ class Play {
         }
 
     }
-    
+
+    public function dns () {
+        $records = $this->TrueApi->DnsRecords->index();
+        prd($records);
+    }
+
     public function main() {
+        return $this->dns();
+        
+        $servers = $this->TrueApi->Servers->index();
+        print_r($servers);
+        die();
+
         $x = $this->TrueApi->rest('get', 'servers/index');
 
         prd(compact('x'));
