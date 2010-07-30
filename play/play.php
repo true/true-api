@@ -62,21 +62,32 @@ class Play {
 
     public function dns () {
         $records = $this->TrueApi->DnsRecords->index('ladolcevilla.nl');
-//        $this->TrueApi->DnsRecords->edit(12873834, array(
-//            'content' => 'www.google.com',
-//        ));
-        
+        $this->TrueApi->DnsRecords->edit(12873834, array(
+            'content' => 'www.google.com',
+        ));
         prd($records);
+        
     }
 
     public function servers () {
+        $y = $this->TrueApi->Servers->edit(2313, array('color' => 'gray', 'os_serial' => 'x'));
+        die();
+        $this->TrueApi->Servers->apiBuffer(true);
+        $w = $this->TrueApi->Servers->add(array('color' => 'gray', 'os_serial' => 'x'));
+        $y = $this->TrueApi->Servers->edit(2313, array('color' => 'gray', 'os_serial' => 'x'));
+        $z = $this->TrueApi->Servers->apiBuffer('flush');
+        pr(compact('w', 'x', 'y', 'z'));
+
+        die();
+        $x = $this->TrueApi->Servers->edit(2862, array('relatie_id' => 1378));
+        die();
         $servers = $this->TrueApi->Servers->index();
         print_r($servers);
     }
 
     public function main() {
-        return $this->dns();
-        #return $this->servers();
+        return $this->servers();
+        #return $this->dns();
         
         die();
 
@@ -140,7 +151,6 @@ class Play {
         die();
 
 
-        $x = $this->TrueApi->Servers->edit(2862, array('relatie_id' => 1378));
         
         #$w = $this->TrueApi->Servers->index();
 
@@ -149,13 +159,6 @@ class Play {
 
 
 
-        die();
-
-        $this->TrueApi->Servers->apiBuffer(true);
-        $w = $this->TrueApi->Servers->add(array('color' => 'gray', 'os_serial' => 'x'));
-        $y = $this->TrueApi->Servers->edit(2313, array('color' => 'gray', 'os_serial' => 'x'));
-        $z = $this->TrueApi->Servers->apiBuffer('flush');
-        pr(compact('w', 'x', 'y', 'z'));
 
 
         die();
