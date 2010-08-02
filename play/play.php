@@ -61,11 +61,19 @@ class Play {
     }
 
     public function dns () {
-        $this->TrueApi->DnsRecords->edit(12873834, array(
+//        $this->TrueApi->DnsRecords->edit(12873834, array(
+//            'content' => 'www3.google.com',
+//        ));
+
+        #$records = $this->TrueApi->DnsRecords->index('ladolcevilla.nl');
+        
+        $a = $this->TrueApi->DnsRecords->add(array(
+            'name' => 'piet.ladolcevilla.nl',
+            'type' => 'CNAME',
             'content' => 'www3.google.com',
         ));
-        $records = $this->TrueApi->DnsRecords->index('ladolcevilla.nl');
-        prd($records);
+        
+        prd(compact('records', 'a'));
         
     }
 
