@@ -36,7 +36,7 @@ class TrueApi extends Base {
     public    $controllers    = array();
 
     protected $_apiApp        = 'True Api';
-    protected $_apiVer        = '0.2';
+    protected $_apiVer        = '0.3';
     protected $_apiUrl        = 'http://github.com/true/true-api/raw/master/TrueApi.php';
 
     protected $_authorization = array();

@@ -158,10 +158,28 @@ class TrueApiController {
     }
 
     public function index ($scope = null, $vars = array()) {
-        $data = $this->_get(
-            sprintf('%s%s', __FUNCTION__, is_string($scope) ? '/scope:' . $scope : ''),
-            $vars
-        );
+        $path = __FUNCTION__;
+        if (is_string($scope)) {
+            if (!isset($this->actions[__FUNCTION__]['scopeVar'])) {
+                return $this->err(
+                    'Server did not specify which "scopeVar" should be used for action %s',
+                     __FUNCTION__
+                );
+            }
+
+            $path = sprintf(
+                '%s/%s:%s',
+                $path,
+                $this->actions[__FUNCTION__]['scopeVar'],
+                $scope
+            );
+        } elseif (is_array($scope)) {
+            foreach ($scope as $k => $v) {
+                $path .= '/' . $k . ':' . $v;
+            }
+        }
+
+        $data = $this->_get($path, $vars);
         return $data;
     }
 
