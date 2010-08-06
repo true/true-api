@@ -48,6 +48,7 @@ class TrueApi extends Base {
         'returnData' => false,
         'fetchControllers' => true,
         'checkVersion' => true,
+        'checkTime' => 600, // 10 minutes
 
         'log-date-format' => 'Y-m-d H:i:s',
         'log-file' => '/var/log/true-api.log',
@@ -109,6 +110,17 @@ class TrueApi extends Base {
             }
         }
 
+        $remoteTime = $this->data(
+            $response,
+            'time_epoch',
+            'meta'
+        );
+        $diff = gmdate('U') - $remoteTime;
+        $this->debug('Time difference of %s second(s) with server', $diff);
+
+        if (abs($diff) > $this->opt('checkTime')) {
+            $this->crit('Time difference exceeds limit of %s seconds', $this->opt('checkTime'));
+        }
 
         $this->controllers = $this->data(
             $response,
