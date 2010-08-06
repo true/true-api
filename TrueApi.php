@@ -197,7 +197,6 @@ class TrueApi extends Base {
     }
 
     protected function _badResponse ($dump = '', $reason = 'no reason') {
-        prd($dump);
         $this->debug('Received invalid response: %s', $dump);
         return $this->crit('Invalid response from server: %s', $reason);
     }

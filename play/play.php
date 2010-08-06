@@ -33,7 +33,8 @@ if (!function_exists('d')) {
 class Play {
 
     public function  __construct() {
-        if (false) {
+        $employee = true;
+        if ($employee) {
             $this->TrueApi = new TrueApi(array(
                 'log-print-level' => 'debug',
                 'verifySSL' => false,
@@ -60,21 +61,27 @@ class Play {
 
     }
 
+    public function highlander () {
+        $a = $this->TrueApi->VmHosts->get_schedule('kvm04.true.nl');
+        
+        prd(compact('records', 'a'));
+    }
+
     public function dns () {
 //        $this->TrueApi->DnsRecords->edit(12873834, array(
 //            'content' => 'www3.google.com',
 //        ));
 
         #$records = $this->TrueApi->DnsRecords->index('ladolcevilla.nl');
-        
+
         $a = $this->TrueApi->DnsRecords->add(array(
             'name' => 'piet.ladolcevilla.nl',
             'type' => 'CNAME',
             'content' => 'www3.google.com',
         ));
-        
+
         prd(compact('records', 'a'));
-        
+
     }
 
     public function servers () {
@@ -95,8 +102,12 @@ class Play {
 
     public function main() {
         #return $this->servers();
-        return $this->dns();
+        return $this->highlander();
         
+        die();
+        
+        return $this->dns();
+
         die();
 
         $x = $this->TrueApi->rest('get', 'servers/index');
