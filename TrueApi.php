@@ -212,7 +212,28 @@ class TrueApi extends Base {
         $this->debug('Received invalid response: %s', $dump);
         return $this->crit('Invalid response from server: %s', $reason);
     }
-    
+
+    /**
+     * Get a machine's IPs
+     *
+     * @return mixed boolean on failure, string on $first == true, or array
+     */
+    public function getIPs($first = false, $ipv6 = true) {
+        $cmd = '/sbin/ifconfig';
+        if (!file_exists($cmd)) {
+            return false;
+        }
+
+        $ifconfig = `${cmd}`;
+        if (!preg_match_all('/inet' . ($ipv6 ? '6?' : '') . ' addr: ?([^ ]+)/', $ifconfig, $ips)) {
+            return false;
+        }
+        if ($first === true) {
+            return $ips[1][0];
+        }
+        return $ips[1];
+    }
+
     public function response ($parsed) {
         if (is_array(@$parsed['meta']['feedback'])) {
             $fail = false;

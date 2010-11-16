@@ -61,6 +61,10 @@ class Play {
 
     }
 
+    public function ips () {
+        $a = $this->TrueApi->getIPs();
+        prd($a);
+    }
     public function highlander () {
         $a = $this->TrueApi->VmHosts->get_schedule('kvm04.true.nl');
         
@@ -101,9 +105,12 @@ class Play {
     }
 
     public function main() {
+        return $this->ips();
+        
+        die();
         #return $this->servers();
         return $this->highlander();
-        
+
         die();
         
         return $this->dns();
