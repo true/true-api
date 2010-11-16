@@ -33,7 +33,7 @@ if (!function_exists('d')) {
 class Play {
 
     public function  __construct() {
-        $employee = true;
+        $employee = false;
         if ($employee) {
             $this->TrueApi = new TrueApi(array(
                 'log-print-level' => 'debug',
@@ -63,6 +63,7 @@ class Play {
 
     public function ips () {
         $a = $this->TrueApi->getIPs();
+
         prd($a);
     }
     public function highlander () {
@@ -105,6 +106,10 @@ class Play {
     }
 
     public function main() {
+        return $this->dns();
+
+        die();
+        
         return $this->ips();
         
         die();
@@ -113,9 +118,6 @@ class Play {
 
         die();
         
-        return $this->dns();
-
-        die();
 
         $x = $this->TrueApi->rest('get', 'servers/index');
 

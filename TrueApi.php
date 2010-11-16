@@ -218,7 +218,7 @@ class TrueApi extends Base {
      *
      * @return mixed boolean on failure, string on $first == true, or array
      */
-    public function getIPs($first = false, $ipv6 = true) {
+    public function getIPs ($first = false, $ipv6 = true) {
         $cmd = '/sbin/ifconfig';
         if (!file_exists($cmd)) {
             return false;
