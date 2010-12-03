@@ -157,6 +157,14 @@ class TrueApiController {
         return $this->_rest($method, $action, array_shift($vars));
     }
 
+    /**
+     * Index
+     *
+     * @param mixed array or string $scope  Either named scope as string or /key:val/ params as array
+     * @param array                 $vars   Post variables
+     *
+     * @return array
+     */
     public function index ($scope = null, $vars = array()) {
         $path = __FUNCTION__;
         if (is_string($scope)) {
