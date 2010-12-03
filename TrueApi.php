@@ -40,6 +40,7 @@ class TrueApi extends Base {
     protected $_apiUrl        = 'http://github.com/true/true-api/raw/master/TrueApi.php';
 
     protected $_authorization = array();
+    protected $_response = array();
 
     protected $_options = array(
         'service' => 'http://cake.truecare.dev/',
@@ -93,8 +94,8 @@ class TrueApi extends Base {
         $response = $this->ApiControllers->index();
         
         if ($this->opt('checkVersion')) {
-            $remoteVersion = $this->data(
-                $response,
+            $remoteVersion = $this->find(
+                $this->_response,
                 'version',
                 'meta'    
             );
@@ -110,8 +111,8 @@ class TrueApi extends Base {
             }
         }
 
-        $remoteTime = $this->data(
-            $response,
+        $remoteTime = $this->find(
+            $this->_response,
             'time_epoch',
             'meta'
         );
@@ -122,8 +123,8 @@ class TrueApi extends Base {
             $this->crit('Time difference exceeds limit of %s seconds', $this->opt('checkTime'));
         }
 
-        $this->controllers = $this->data(
-            $response,
+        $this->controllers = $this->find(
+            $this->_response,
             'controllers'
         );
 
@@ -162,7 +163,7 @@ class TrueApi extends Base {
      *
      * @return array
      */
-    public function data ($data, $key = null, $parent = 'data') {
+    public function find ($data, $key = null, $parent = 'data') {
         if (isset($data[$parent])) {
             $data = $data[$parent];
         }
@@ -256,6 +257,8 @@ class TrueApi extends Base {
             return $this->_badResponse($parsed, 'No data');
         }
 
+        $this->_response = $parsed;
+
         if ($this->opt('returnData')) {
             return $parsed['data'];
         }
@@ -347,6 +350,8 @@ class TrueApi extends Base {
     }
 
     public function rest ($method, $path, $vars = array()) {
+        $this->_response = array();
+        
         // Validate
         if (!method_exists($this->RestClient(), $method)) {
             return $this->err('Rest method "%s" does not exist.', $method);
