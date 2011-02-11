@@ -49,7 +49,7 @@ class Play {
             $this->TrueApi = new TrueApi(array(
                 'log-print-level' => 'debug',
                 'verifySSL' => false,
-                'format' => 'xml',
+                'format' => 'json',
                 'service' => 'http://cake.truecare.dev/',
             ));
             $this->TrueApi->auth('1823',
@@ -77,13 +77,13 @@ class Play {
 //            'content' => 'www3.google.com',
 //        ));
 
-        #$records = $this->TrueApi->DnsRecords->index('ladolcevilla.nl');
-
-        $a = $this->TrueApi->DnsRecords->add(array(
-            'name' => 'piet.ladolcevilla.nl',
-            'type' => 'CNAME',
-            'content' => 'www3.google.com',
-        ));
+        $records = $this->TrueApi->DnsRecords->index('ladolcevilla.nl');
+//
+//        $a = $this->TrueApi->DnsRecords->add(array(
+//            'name' => 'piet.ladolcevilla.nl',
+//            'type' => 'CNAME',
+//            'content' => 'www3.google.com',
+//        ));
 
         prd(compact('records', 'a'));
 
