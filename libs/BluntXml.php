@@ -87,7 +87,7 @@ class BluntXml {
 	 * SimpleXML Object to Array
 	 *
 	 * @param object $object
-     *
+	 *
 	 * @return array $array
 	 */
 	protected function _toArray ($object) {
@@ -99,8 +99,8 @@ class BluntXml {
 			   } else {
 				   $array[$key] = $this->_toArray($val);
 			   }
-           } else if (is_array($val)) {
-               $array[$key] = $this->_toArray($val);
+		   } else if (is_array($val)) {
+			   $array[$key] = $this->_toArray($val);
 		   } else {
 			   $array[$key] = $this->_toArrayValue($val, $key);
 		   }

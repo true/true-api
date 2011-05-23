@@ -49,7 +49,7 @@ Let's look at an example how to include & use the Client
     $success = $TrueApi->Servers->add(array(
         'hostname' => 'www.example.com',
     ));
-?>
+    ?>
 
 ## More Configurable options
 
