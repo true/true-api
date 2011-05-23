@@ -8,40 +8,39 @@ require_once dirname(dirname(__FILE__)) .'/TrueApiController.php';
  */
 class TrueApiControllerTest extends PHPUnit_Framework_TestCase
 {
-    /**
-     * @var    TrueApiController
-     * @access protected
-     */
-    protected $TrueApiController;
+	/**
+	 * @var    TrueApiController
+	 * @access protected
+	 */
+	protected $TrueApiController;
 
-    /**
-     * Sets up the fixture, for example, opens a network connection.
-     * This method is called before a test is executed.
-     *
-     * @access protected
-     */
-    protected function setUp()
-    {
-        $this->TrueApiController = new TrueApiController('servers', array('MockTrueApi', 'rest'));
-    }
-    
-    public function testIndex()
-    {   
-        $actual   = $this->TrueApiController->index();
-        $expected = array (
-            'method' => 'get',
-            'path' => 'servers/index',
-            'vars' => array(
+	/**
+	 * Sets up the fixture, for example, opens a network connection.
+	 * This method is called before a test is executed.
+	 *
+	 * @access protected
+	 */
+	protected function setUp()
+	{
+		$this->TrueApiController = new TrueApiController('servers', array('MockTrueApi', 'rest'));
+	}
 
-            ),
-        );
-        $this->assertSame($expected, $actual);
-    }
+	public function testIndex()
+	{
+		$actual   = $this->TrueApiController->index();
+		$expected = array (
+			'method' => 'get',
+			'path' => 'servers/index',
+			'vars' => array(
+
+			),
+		);
+		$this->assertSame($expected, $actual);
+	}
 }
 
 class MockTrueApi {
-    public function rest($method, $path, $vars) {
-        return compact('method', 'path', 'vars');
-    }
+	public function rest($method, $path, $vars) {
+		return compact('method', 'path', 'vars');
+	}
 }
-?>
