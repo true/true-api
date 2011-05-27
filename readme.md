@@ -3,7 +3,7 @@
     aptitude install git-core php5-cli php5-curl
     
     touch /var/log/true-api.log
-    chmod 777 /var/log/true-api.log # Or: at least write permissions for the user running your script
+    chmod 666 /var/log/true-api.log # Or: at least write permissions for the user running your script
     
     mkdir -p /var/git 
     cd /var/git/  
