@@ -128,7 +128,7 @@ class TrueApiController {
 	public function  __call ($action, $vars) {
 		if (!isset($this->actions[$action])) {
 			return $this->err(
-				'Action %s not implemented for REST on controller %s',
+				'Action %s not implemented for REST on controller %s or disabled by ACL',
 				 $action,
 				 $this->controller
 			);
