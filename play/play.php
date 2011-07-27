@@ -51,6 +51,9 @@ class Play {
 				'verifySSL' => false,
 				'format' => 'json',
 				'service' => 'http://cake.truecare.dev/',
+				'meta' => array(
+					'dryrun' => true,
+				),
 			));
 			$this->TrueApi->auth('1823',
 				file_get_contents(DIR_PLAY_ROOT.'/pw_cust'),
@@ -90,7 +93,7 @@ class Play {
 	}
 
 	public function servers () {
-		$y = $this->TrueApi->Servers->edit(2313, array('color' => 'gray', 'os_serial' => 'x'));
+		$y = $this->TrueApi->Servers->edit(2862, array('color' => 'gray', 'os_serial' => 'x'));
 		die();
 		$this->TrueApi->Servers->apiBuffer(true);
 		$w = $this->TrueApi->Servers->add(array('color' => 'gray', 'os_serial' => 'x'));
@@ -106,16 +109,16 @@ class Play {
 	}
 
 	public function main() {
-		return $this->dns();
+		return $this->servers();
+		die();
 
+		return $this->dns();
 		die();
 
 		return $this->ips();
-
 		die();
-		#return $this->servers();
-		return $this->highlander();
 
+		return $this->highlander();
 		die();
 
 

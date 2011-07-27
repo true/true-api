@@ -50,6 +50,9 @@ class TrueApi extends Base {
 		'fetchControllers' => true,
 		'checkVersion' => true,
 		'checkTime' => 600, // 10 minutes
+		'meta' => array(
+		),
+		'metaCallback' => null,
 
 		'log-date-format' => 'Y-m-d H:i:s',
 		'log-file' => '/var/log/true-api.log',
@@ -349,6 +352,11 @@ class TrueApi extends Base {
 		return $this->RestClient;
 	}
 
+	public function meta ($params) {
+		$meta = $this->opt('meta');
+		return $meta;
+	}
+
 	public function rest ($method, $path, $vars = array()) {
 		$this->_response = array();
 
@@ -367,9 +375,23 @@ class TrueApi extends Base {
 		$this->RestClient()->request_suffix = '.'.$this->opt('format');
 
 		// Wrap any data in the data var
+		$payload = array();
 		if (!empty($vars)) {
-			$vars = array('data' => $vars);
+			$payload['data'] = $vars;
 		}
+
+		if (null === ($cb = $this->opt('metaCallback'))) {
+			$cb = array($this, 'meta');
+		}
+
+		if (!is_callable($cb)) {
+			return $this->err('Invalid meta callback: %s', $cb);
+		}
+		$payload['meta'] = call_user_func($cb, array(
+			'method' => $method,
+			'path' => $path,
+			'vars' => $vars,
+		));
 
 		$this->debug('requesting path: %s', $path);
 
@@ -377,7 +399,7 @@ class TrueApi extends Base {
 		$parsed = call_user_func(
 			array($this->RestClient(), $method),
 			$path,
-			$vars
+			$payload
 		);
 
 
