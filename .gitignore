@@ -1,4 +1,5 @@
 .gitup.dat
+*.swp
 .cache
 .settings
 nbproject
