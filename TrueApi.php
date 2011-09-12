@@ -190,11 +190,15 @@ class TrueApi extends Base {
 	 *
 	 * @return <type>
 	 */
-	public function auth ($username, $password, $apikey, $class = 'Customer') {
+	public function auth ($username, $password, $apikey, $class = null) {
 		$username = trim($username);
 		$password = trim($password);
 		$apikey   = trim($apikey);
 		$class    = trim($class);
+
+		if (!$class) {
+			$class = 'Customer';
+		}
 
 		$query = http_build_query(compact(
 			'username',
@@ -395,7 +399,6 @@ class TrueApi extends Base {
 			'path' => $path,
 			'vars' => $vars,
 		));
-
 		$this->debug('requesting path: %s', $path);
 
 		// Make the call
