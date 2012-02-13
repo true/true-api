@@ -13,6 +13,14 @@ cd true-api/
 git submodule update --init
 ```
 
+### Update
+
+```sh
+cd /var/git/true-api
+git pull
+git submodule update
+```
+
 You now have a working copy of our PHP API Client in `/var/git/true-api`
 Let's look at an example how to include & use the Client
 
@@ -52,14 +60,13 @@ $success = $TrueApi->Servers->edit(1337, array(
 $success = $TrueApi->Servers->add(array(
 	'hostname' => 'www.example.com',
 ));
-?>
 ```
 
 ## More Configurable options
 
 ```php
 <?php
-// Other configurable options:
+// Other configurable [options](https://github.com/true/true-api/blob/master/TrueApi.php#L45):
 $_options = array(
 	'service' => 'http://api.true.nl/',
 	'format' => 'json',
@@ -72,5 +79,4 @@ $_options = array(
 	'log-file' => '/var/log/true-api.log',
 	'log-break-level' => 'crit',
 );
-?>
 ```
