@@ -57,6 +57,7 @@ class Play {
 					'dryrun' => true,
 				),
 			));
+
 			$this->TrueApi->auth('1823',
 				file_get_contents(DIR_PLAY_ROOT.'/pw_cust'),
 				file_get_contents(DIR_PLAY_ROOT.'/apikey_cust'),
@@ -110,7 +111,7 @@ class Play {
 		print_r($servers);
 	}
 
-	public function main() {
+	public function main () {
 		return $this->servers();
 		die();
 
