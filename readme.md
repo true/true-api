@@ -64,9 +64,10 @@ $success = $TrueApi->Servers->add(array(
 
 ## More Configurable options
 
+Other configurable [options](https://github.com/true/true-api/blob/master/TrueApi.php#L45):
+
 ```php
 <?php
-// Other configurable [options](https://github.com/true/true-api/blob/master/TrueApi.php#L45):
 $_options = array(
 	'service' => 'http://api.true.nl/',
 	'format' => 'json',
