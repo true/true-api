@@ -1,15 +1,24 @@
 <?php
-define('DIR_PLAY_ROOT', dirname(__FILE__));
-require_once dirname(dirname(__FILE__)) .'/TrueApi.php';
+set_time_limit(0);
+date_default_timezone_set('Europe/Amsterdam');
+error_reporting(E_ALL | E_STRICT);
+ini_set('memory_limit', '256M');
+ini_set('magic_quotes_runtime', 0);
 
-error_reporting(E_ALL);
 if (!function_exists('pr')) {
 	function pr($arr) {
+		if (php_sapi_name() !=='cli') {
+			echo '<pre>'."\n";
+		}
 		if (is_array($arr) && count($arr)) {
 			print_r($arr);
 		} else {
 			var_dump($arr);
 		}
+		if (php_sapi_name() !=='cli') {
+			echo '</pre>';
+		}
+
 		echo "\n";
 	}
 }
@@ -19,16 +28,9 @@ if (!function_exists('prd')) {
 		die();
 	}
 }
-if (!function_exists('d')) {
-	function d() {
-		$args = func_get_args();
-		if (count($args) == 1) {
-			prd($args[0]);
-		} else {
-			prd($args);
-		}
-	}
-}
+
+define('DIR_PLAY_ROOT', dirname(__FILE__));
+require_once dirname(dirname(__FILE__)) .'/TrueApi.php';
 
 class Play {
 
@@ -38,7 +40,7 @@ class Play {
 			$this->TrueApi = new TrueApi(array(
 				'log-print-level' => 'debug',
 				'verifySSL' => false,
-				'service' => 'http://admin.true.dev/cakephp/',
+				'service' => 'http://admin.true.kev/cakephp/',
 			));
 			$this->TrueApi->auth('munin',
 				file_get_contents(DIR_PLAY_ROOT.'/pw'),
@@ -50,7 +52,7 @@ class Play {
 				'log-print-level' => 'debug',
 				'verifySSL' => false,
 				'format' => 'json',
-				'service' => 'http://cake.truecare.dev/',
+				'service' => 'http://care.true.kev/',
 				'meta' => array(
 					'dryrun' => true,
 				),
