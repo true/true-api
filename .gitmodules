@@ -1,6 +1,0 @@
-[submodule "vendors/rest_client"]
-	path = vendors/rest_client
-	url = git://github.com/true/rest_client.git
-[submodule "vendors/eggshell"]
-	path = vendors/eggshell
-	url = git://github.com/true/eggshell.git
