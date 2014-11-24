@@ -4,6 +4,10 @@
  *
  * @author kvz
  */
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerInterface;
+use Psr\Log\LogLevel;
+
 class Base {
 	protected $_options = array(
 		'log-print-level' => 'info',
@@ -20,6 +24,12 @@ class Base {
 		'class-autobind' => false,
 		'class-autosetup' => false,
 	);
+
+	protected $logger;
+
+	public function setLogger(LoggerInterface $logger) {
+		$this->logger = $logger;
+	}
 
 	public $logs;
 
@@ -550,6 +560,17 @@ class Base {
 			'debug',
 			'debugv',
 		));
+		$levelMap = array(
+			'emerg'   => LogLevel::EMERGENCY,
+			'alert'   => LogLevel::ALERT,
+			'crit'    => LogLevel::CRITICAL,
+			'err'     => LogLevel::ERROR,
+			'warning' => LogLevel::WARNING,
+			'notice'  => LogLevel::NOTICE,
+			'info'    => LogLevel::INFO,
+			'debug'   => LogLevel::DEBUG,
+			'debugv'  => LogLevel::DEBUG,
+		);
 
 		$section   = false;
 		$showLevel = $level;
@@ -618,6 +639,9 @@ class Base {
                         }
 
 			file_put_contents($this->_options['log-file'], $str."\n", FILE_APPEND);
+		}
+		if (isset($levelMap[$useLevel]) && !empty($this->logger)) {
+			$this->logger->log($levelMap[$useLevel], $str);
 		}
 		if ($msgWeight <= $breakWeight) {
 
