@@ -1,0 +1,9 @@
+{
+    "name": "true/true-api",
+    "config": {
+        "vendor-dir": "vendors"
+    },
+    "require": {
+        "psr/log": "~1.0"
+    }
+}

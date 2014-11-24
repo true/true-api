@@ -10,3 +10,6 @@ etc/pharos_scanner_id
 modules/data/*.sql
 modules/settings.dat
 play/
+
+vendors/
+composer.lock
