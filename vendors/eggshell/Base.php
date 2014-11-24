@@ -611,6 +611,10 @@ class Base {
 			$indent    = '        ';
 		}
 
+		if (!empty($this->logger) && isset($levelMap[$useLevel])) {
+			$this->logger->log($levelMap[$useLevel], $str);
+		}
+
 		$msgWeight    = $levels[$useLevel];
 		$printWeight  = $levels[$this->_options['log-print-level']];
 		$memoryWeight = $levels[$this->_options['log-memory-level']];
@@ -641,9 +645,6 @@ class Base {
                         }
 
 			file_put_contents($this->_options['log-file'], $str."\n", FILE_APPEND);
-		}
-		if (!empty($this->logger) && isset($levelMap[$useLevel])) {
-			$this->logger->log($levelMap[$useLevel], $str);
 		}
 		if ($msgWeight <= $breakWeight) {
 
