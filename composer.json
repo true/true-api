@@ -3,6 +3,11 @@
     "config": {
         "vendor-dir": "vendors"
     },
+    "autoload": {
+        "files": [
+            "TrueApi.php"
+        ]
+    },
     "require": {
         "psr/log": "~1.0"
     }

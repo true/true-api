@@ -28,13 +28,13 @@ Let's look at an example how to include & use the Client
 
 ```php
 <?php
-// Include
-require_once '/var/git/true-api/TrueApi.php';
+// Import class
+use \TrueApi;
 
 // Instantiate
 // (more configurable options below)
 $TrueApi = new TrueApi(array(
-	'log-file' => '/var/log/true-api.log',
+	'log-file' => __DIR__ . '/api.log',
 ));
 
 // In real life: get credentials from some place safe,
@@ -69,8 +69,6 @@ Other configurable [options](https://github.com/true/true-api/blob/master/TrueAp
 ```php
 <?php
 $_options = array(
-	'service' => 'http://api.true.nl/',
-	'format' => 'json',
 	'verifySSL' => true,
 	'returnData' => false,
 	'fetchControllers' => true,
