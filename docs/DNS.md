@@ -32,7 +32,7 @@ Output:
 
 #### `POST /dns_domains/add`
 
-Create a new DNS Domain.
+Create a new Master DNS Domain.
 
 Example:
 ```php
@@ -52,6 +52,17 @@ Array
 	[name] => example.com
 	[type] => NATIVE
 )
+```
+
+To create a Slave DNS Domain:
+```php
+<?php
+$domain = $TrueApi->DnsDomains->add(array(
+	'name' => 'example.com',
+	'type' => 'SLAVE',
+	'master' => '93.184.216.34',
+));
+print_r($domain['data']['DnsDomain']);
 ```
 
 
