@@ -180,3 +180,15 @@ Array
 	[id] => 43661163
 )
 ```
+
+
+#### `DELETE /dns_records/delete/$recordId`
+
+Deletes a DNS Record.
+
+Example:
+```php
+<?php
+$response = $TrueApi->DnsRecords->delete(43661163);
+print_r($response);
+```
