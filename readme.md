@@ -1,7 +1,7 @@
 ## Setup (ubuntu)
 
 ```sh
-aptitude install git-core php5-cli php5-curl
+apt-get install git-core php5-cli php5-curl
 
 touch /var/log/true-api.log
 chmod 666 /var/log/true-api.log # Or: at least write permissions for the user running your script
