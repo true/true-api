@@ -120,7 +120,7 @@ class RestClient {
     }
 
     protected function request($method, $url, $vars = array()) {
-        if ($method != 'get') $vars['_method'] = $method;
+        if ($method != 'get') $vars['_method'] = strtoupper($method);
         $this->url = $this->request_prefix.$url.$this->request_suffix;
         $response  = ($method === 'get') ? $this->curlGet($this->url, $vars) : $this->curlPost($this->url, $vars);
         $crash     = $fail = false;
