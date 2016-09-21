@@ -251,9 +251,9 @@ class Curl {
             curl_setopt($this->request, CURLOPT_COOKIEJAR, $this->cookie_file);
         }
 
-        curl_setopt($this->request, CURLOPT_SSL_VERIFYHOST, !!$this->verify_ssl);
+        curl_setopt($this->request, CURLOPT_SSL_VERIFYHOST, (!!$this->verify_ssl ? 2 : 0));
         curl_setopt($this->request, CURLOPT_SSL_VERIFYPEER, !!$this->verify_ssl);
-        
+
         if ($this->follow_redirects) curl_setopt($this->request, CURLOPT_FOLLOWLOCATION, true);
         if ($this->referer) curl_setopt($this->request, CURLOPT_REFERER, $this->referer);
 
